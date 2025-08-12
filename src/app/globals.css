@@ -3,12 +3,15 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Fonts */
+  --font-ui: var(--font-dm-sans);
+  --font-display: var(--font-caprasimo);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-dm-sans);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -19,8 +22,36 @@
   }
 }
 
-body {
+html, body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-ui, system-ui), ui-sans-serif, system-ui, -apple-system,
+    Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+/* Utility for display font (use next/font variable directly to avoid var indirection) */
+.font-display {
+  font-family: var(--font-caprasimo, serif), ui-serif, Georgia, Cambria, "Times New Roman",
+    Times, serif !important;
+}
+
+/* Scrollbar (dark, transparent track) */
+* {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }

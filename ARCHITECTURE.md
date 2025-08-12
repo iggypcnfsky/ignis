@@ -32,6 +32,28 @@ This document captures the current architecture for the Ignis platform and evolv
 
 - **Framework**: Next.js App Router with RSC for data fetching; client components for camera capture and chat.
 - **UI**: Tailwind (mobile-first). Ensure controls are one-hand reachable and accessible; progressively enhance for desktop.
+- **Icons**: `lucide-react` for all icons to ensure a consistent, lightweight icon set.
+- **Fonts**: Google Fonts via `next/font/google` for zero-FOIT/FOUC and automatic self-hosting. Use `DM Sans` for UI text and `Caprasimo` for display/headers.
+
+---
+
+## Typography & Font Management
+
+- **Loading**: Use `next/font/google` in `src/app/layout.tsx` to load and self-host fonts.
+  - `DM_Sans` with `display: "swap"`, exported as CSS variable `--font-dm-sans` and applied globally via `<body>`.
+  - `Caprasimo` with `display: "swap"`, exported as CSS variable `--font-caprasimo`.
+- **Application**:
+  - Default UI font is `DM Sans` via `body { font-family: var(--font-dm-sans), ... }` (see `globals.css`).
+  - Display/heading font is applied with a utility class `.font-display` that maps to `var(--font-caprasimo)`.
+  - For screens that should use Caprasimo throughout (e.g., Discover), add `font-display` on the screen root container.
+- **Tailwind Integration**:
+  - Tailwind theme `--font-sans` is mapped to `--font-dm-sans` for consistency with `font-sans` utilities.
+- **Fallbacks**:
+  - Provide robust fallbacks in `globals.css` for both sans and serif stacks.
+- **Notes**:
+  - Avoid importing remote Google CSS; always use `next/font` for self-hosting and better CLS.
+  - Prefer using the variable form (`var(--font-...)`) for consistent overrides; where necessary, you can use the `className` provided by `next/font` to force application.
+- **i18n**: Internationalization via `next-i18next` (powered by `i18next`) with JSON locale files per language and feature.
 - **Routing**: Feature-oriented routes under `src/app` with nested layouts for Problems, Ideas, Meetups, and Chat.
 - **Data fetching**: Server Components or Route Handlers for secure operations; client components subscribe to Realtime.
 - **State**:
@@ -268,6 +290,20 @@ Each feature owns UI, validation (Zod), and data adapters. Cross-feature contrac
 - **Accessibility**: Keyboard nav, color contrast, captions for media.
 - **Observability**: Minimal client logs; server logs in Edge Functions; privacy-preserving metrics.
 - **Testing**: Unit tests for data adapters; Playwright for critical flows (post problem, join chat).
+
+---
+
+## Animations & Motion System
+
+- Centralize motion tokens and presets in a single module (e.g., `src/lib/motion.ts`).
+- Store shared timings and easings:
+  - `duration.fast = 0.2s`, `duration.base = 0.3s`, `duration.slow = 0.5s`.
+  - `easing.inOut = cubic-bezier(0.4, 0.0, 0.2, 1)`; `easing.out = cubic-bezier(0, 0, 0.2, 1)`.
+- Provide simple templates/helpers for common patterns:
+  - `fadeIn` (opacity 0 → 1, 0.3s, inOut)
+  - `fadeInUp` (opacity + translateY, 0.3s, inOut)
+  - `scaleIn` (scale 0.98 → 1, 0.2s, out)
+- Prefer CSS-first transitions for simple effects; use a motion lib (e.g., Framer Motion) for complex orchestrations.
 
 ---
 
