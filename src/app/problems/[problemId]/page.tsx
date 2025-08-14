@@ -22,7 +22,7 @@ export default function ProblemDetails() {
         <div className="relative mx-auto flex max-w-[380px] items-center justify-center">
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => router.push("/")}
             aria-label="Back to Discover"
             className="absolute left-0 top-0 inline-flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(36,36,36,0.3)] backdrop-blur-[100px]"
           >
