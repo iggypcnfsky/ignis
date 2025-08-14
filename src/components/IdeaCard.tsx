@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, ArrowRight } from "lucide-react";
 
 export type IdeaCardProps = {
 	/** Short description/body of the idea */
@@ -28,10 +28,8 @@ export default function IdeaCard({
 	href,
 	className,
 }: IdeaCardProps) {
-	const Wrapper = href ? Link : ("div" as any);
-	const wrapperProps = href
-		? { href, className: "relative block" }
-		: { className: "relative" };
+const Wrapper = "div" as any;
+const wrapperProps = { className: "relative" } as const;
 
 	const [localVotes, setLocalVotes] = useState<number>(votesCount);
 	const [hasUpvoted, setHasUpvoted] = useState<boolean>(false);
@@ -53,7 +51,8 @@ export default function IdeaCard({
 		<Wrapper {...(wrapperProps as any)}>
 			<article
 				className={
-					"rounded-[30px] bg-[#212121] p-4 text-white " + (className ?? "")
+					"relative rounded-[30px] bg-[#212121] p-4 pr-12 pb-8 text-white " +
+					(className ?? "")
 				}
 				aria-label="Idea card"
 			>
@@ -63,7 +62,7 @@ export default function IdeaCard({
 					{description}
 				</p>
 
-				{/* Metric pills */}
+				{/* Metric pills + inline navigate arrow */}
 				<div className="mt-3 flex items-center gap-[5px]">
 					<span className="inline-flex h-10 items-center justify-center rounded-full bg-[#353535] px-[15px] text-[12px] leading-none">
 						{eventsLabel}
@@ -74,6 +73,15 @@ export default function IdeaCard({
 					<span className="inline-flex h-10 items-center justify-center rounded-full bg-[#353535] px-[13px] text-[12px] leading-none">
 						{durationLabel}
 					</span>
+					{href && (
+						<Link
+							href={href}
+							aria-label="Open idea"
+							className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/30 backdrop-blur-[100px]"
+						>
+							<ArrowRight size={18} className="text-white" />
+						</Link>
+					)}
 				</div>
 			</article>
 

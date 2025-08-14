@@ -49,6 +49,7 @@ export default function ProblemIdeasPage() {
 				{/* First idea card */}
 				<IdeaCard
 					className="mt-[167px]"
+					href="/ideas/idea-1"
 					description={
 						"We could launch a 'Sponsor-a-Bench' program. Local businesses and families could fund a new, durable bench in exchange for a small dedication plaque. To foster community spirit, we could also organize a 'Park Pride Day' where volunteers help assemble and install the new benches, and maybe even give the existing ones a fresh coat of paint. This would be a great way to get everyone involved in improving our park."
 					}
@@ -61,6 +62,7 @@ export default function ProblemIdeasPage() {
 				{/* Second idea card */}
 				<IdeaCard
 					className="mt-4"
+					href="/ideas/idea-2"
 					description={
 						"As a local woodworker, I'd be happy to lead this repair effort. I can first assess all the benches to create a precise materials list—we'll need specific types of treated lumber and rust-proof hardware. Once we have the supplies, I can host a weekend workshop at the park to guide volunteers in safely cutting, assembling, and sealing the new bench slats. We'll get them fixed properly and built to last."
 					}
