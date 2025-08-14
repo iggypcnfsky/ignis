@@ -66,6 +66,46 @@ export default function ProblemIdeasPage() {
 					votesCount={3}
 				/>
 
+				{/* Third idea card (demo) */}
+				<IdeaCard
+					className="mt-4"
+					href={`/problems/${problem.id}/ideas/idea-3`}
+					description={
+						"Partner with the local high school shop class to rebuild benches as a semester project. Students gain hands-on experience while the park receives durable replacements at minimal cost."
+					}
+					votesCount={8}
+				/>
+
+				{/* Fourth idea card (demo) */}
+				<IdeaCard
+					className="mt-4"
+					href={`/problems/${problem.id}/ideas/idea-4`}
+					description={
+						"Host a community fundraiser and adopt-a-bench drive with a public tracker. Each sponsored bench includes a small engraved tag acknowledging contributors."
+					}
+					votesCount={15}
+				/>
+
+				{/* Fifth idea card (demo) */}
+				<IdeaCard
+					className="mt-4"
+					href={`/problems/${problem.id}/ideas/idea-5`}
+					description={
+						"Switch to recycled-plastic lumber for future benches to reduce maintenance and extend lifespan. It resists rot and requires fewer replacements over time."
+					}
+					votesCount={21}
+				/>
+
+				{/* Sixth idea card (demo) */}
+				<IdeaCard
+					className="mt-4"
+					href={`/problems/${problem.id}/ideas/idea-6`}
+					description={
+						"Create a monthly 'Fix-It in the Park' meetup. Each session focuses on small repairs—starting with benches—building regular momentum and volunteer ownership."
+					}
+					votesCount={5}
+				/>
+
 				{/* Sticky CTA: Add your idea */}
 				<div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 px-4 pb-6 sm:px-6">
 					<div className="mx-auto w-full max-w-[380px]">
