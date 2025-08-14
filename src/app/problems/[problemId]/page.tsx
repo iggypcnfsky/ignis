@@ -1,15 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useParams } from "next/navigation";
 import { ChevronLeft, Info } from "lucide-react";
 import ProblemPillNav from "@/components/ProblemPillNav";
 import LogoSymbol from "@/components/Logo";
 import { demoProblems } from "@/lib/demoProblems";
 
-export default function ProblemDetails({ params }: { params: { problemId: string } }) {
+export default function ProblemDetails() {
   const router = useRouter();
-  const problem = demoProblems.find((p) => p.id === params.problemId) ?? demoProblems[0];
+  const params = useParams<{ problemId: string }>();
+  const problemId = Array.isArray(params?.problemId) ? params?.problemId[0] : params?.problemId;
+  const problem = demoProblems.find((p) => p.id === problemId) ?? demoProblems[0];
+  const similarProblems = demoProblems.filter((p) => p.id !== problem.id).slice(0, 3);
 
   return (
     <div className="relative min-h-dvh w-full bg-[#141414] text-white">
@@ -59,7 +63,7 @@ export default function ProblemDetails({ params }: { params: { problemId: string
             </div>
             <p className="mt-3 text-[16px] leading-[1.125]">
               {problem.description} {" "}
-              During my morning walk through Evergreen Commons, I noticed that at least four of the wooden benches along the pond trail are in significant disrepair. Several have splintered or missing slats, and one near the willow tree has collapsed entirely, posing a safety hazard. It's a popular spot for seniors and families, and it would be great to see these fixed so everyone can continue to enjoy the park safely.
+              During my morning walk through Evergreen Commons, I noticed that at least four of the wooden benches along the pond trail are in significant disrepair. Several have splintered or missing slats, and one near the willow tree has collapsed entirely, posing a safety hazard. It&apos;s a popular spot for seniors and families, and it would be great to see these fixed so everyone can continue to enjoy the park safely.
             </p>
           </section>
 
@@ -87,33 +91,22 @@ export default function ProblemDetails({ params }: { params: { problemId: string
           <section className="rounded-[30px] bg-[#212121] p-4 lg:col-span-12">
             <span className="font-display text-[16px] leading-5">Similar problems</span>
             <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-              <div className="relative h-[180px] w-full overflow-hidden rounded-[20px]">
-                <Image
-                  src="/demo-images/park-dirty.png"
-                  alt="picture of the park, by the lake, with trash on the ground"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 33vw"
-                />
-              </div>
-              <div className="relative h-[180px] w-full overflow-hidden rounded-[20px]">
-                <Image
-                  src="/demo-images/park-cigs.png"
-                  alt="picture of the park by the lake, with lots of cigarette buts on the ground next to the water"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 33vw"
-                />
-              </div>
-              <div className="relative h-[180px] w-full overflow-hidden rounded-[20px]">
-                <Image
-                  src="/demo-images/park-holes.jpg"
-                  alt="potholes in the road near the lake and park"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 33vw"
-                />
-              </div>
+              {similarProblems.map((sp) => (
+                <Link
+                  key={sp.id}
+                  href={`/problems/${sp.id}`}
+                  className="relative block h-[180px] w-full overflow-hidden rounded-[20px]"
+                  aria-label={`Open details for ${sp.title}`}
+                >
+                  <Image
+                    src={sp.imagePath}
+                    alt={sp.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 33vw"
+                  />
+                </Link>
+              ))}
             </div>
           </section>
         </div>

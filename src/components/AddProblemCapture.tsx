@@ -42,7 +42,7 @@ export default function AddProblemCapture() {
       if (videoRef.current) {
         const videoEl = videoRef.current;
         videoEl.muted = true;
-        videoEl.playsInline = true as any;
+        videoEl.playsInline = true;
         videoEl.srcObject = stream;
         await new Promise<void>((resolve) => {
           const onLoaded = () => {
