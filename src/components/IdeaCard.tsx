@@ -28,8 +28,6 @@ export default function IdeaCard({
 	href,
 	className,
 }: IdeaCardProps) {
-const Wrapper = "div" as any;
-const wrapperProps = { className: "relative" } as const;
 
 	const [localVotes, setLocalVotes] = useState<number>(votesCount);
 	const [hasUpvoted, setHasUpvoted] = useState<boolean>(false);
@@ -47,8 +45,8 @@ const wrapperProps = { className: "relative" } as const;
 	setLocalVotes((v) => v + 1);
 	}
 
-	return (
-		<Wrapper {...(wrapperProps as any)}>
+    return (
+        <div className="relative">
 			<article
 				className={
 					"relative rounded-[30px] bg-[#212121] p-4 pr-12 pb-8 text-white " +
@@ -103,8 +101,8 @@ const wrapperProps = { className: "relative" } as const;
 					<ArrowUp size={18} className="text-white" />
 					<span className="text-[12px] leading-none">{localVotes}</span>
 				</button>
-			</div>
-		</Wrapper>
+            </div>
+        </div>
 	);
 }
 

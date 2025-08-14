@@ -80,15 +80,15 @@ Route suggestions assume Next.js App Router under `src/app`.
   - Media carousel, description, map/location, poll results, related problems, actions (Share, Add Idea, See Meetups, Chat).
 - **Ideas for Problem** (`/problems/[problemId]/ideas`)
   - Card list of ideas with votes; sort by top/new; link to idea details.
-- **Detailed Idea** (`/ideas/[ideaId]`)
+- **Detailed Idea** (`/problems/[problemId]/ideas/[ideaId]`)
   - Description, media/visuals, step-by-step plan, cost/resources, author, linked problems, upcoming meetups; CTA to organize meetup.
-- **Add Idea Flow** (`/ideas/add?problemId=...`)
+- **Add Idea Flow** (`/problems/[problemId]/ideas/add?problemId=...`)
   - Wizard: (1) idea summary → (2) visuals → (3) plan steps → (4) resources & cost → (5) author details → (6) congrats → idea view.
 - **Problem Meetups** (`/problems/[problemId]/meetups`)
   - Upcoming meetups tied to the problem; CTA to create meetup.
-- **Detailed Meetup** (`/meetups/[meetupId]`)
+- **Detailed Meetup** (`/problems/[problemId]/meetups/[meetupId]`)
   - Agenda, linked idea(s) and optional problem, location/map, time, details, Join button.
-- **Add Meetup Flow** (`/meetups/add`)
+- **Add Meetup Flow** (`/problems/[problemId]/meetups/add`)
   - Wizard: (1) agenda → (2) select idea(s)/none → (3) details + location/contact → (4) congrats → meetup view.
 - **Share Problem** (`/problems/[problemId]/share`)
   - Deep link, QR code, A4 poster download (QR + description), copyable social post text.
