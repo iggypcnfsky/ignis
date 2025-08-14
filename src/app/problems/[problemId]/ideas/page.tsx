@@ -35,7 +35,7 @@ export default function ProblemIdeasPage() {
 				</div>
 			</div>
 
-			<main className="mx-auto h-full w-full max-w-[402px] px-4 pt-[108px] pb-6 sm:px-6">
+				<main className="mx-auto h-full w-full max-w-[402px] px-4 pt-[108px] pb-[120px] sm:px-6">
 				{/* Glow ellipse background per design */}
 				<div
 					aria-hidden
@@ -48,45 +48,36 @@ export default function ProblemIdeasPage() {
 
 				{/* First idea card */}
 				<IdeaCard
-					className="mt-[167px]"
-					href="/ideas/idea-1"
+					className="mt-3"
+					href={`/problems/${problem.id}/ideas/idea-1`}
 					description={
 						"We could launch a 'Sponsor-a-Bench' program. Local businesses and families could fund a new, durable bench in exchange for a small dedication plaque. To foster community spirit, we could also organize a 'Park Pride Day' where volunteers help assemble and install the new benches, and maybe even give the existing ones a fresh coat of paint. This would be a great way to get everyone involved in improving our park."
 					}
-					eventsLabel="5 events"
-					costLabel="~500€"
-					durationLabel="2 weeks"
 					votesCount={12}
 				/>
 
 				{/* Second idea card */}
 				<IdeaCard
 					className="mt-4"
-					href="/ideas/idea-2"
+					href={`/problems/${problem.id}/ideas/idea-2`}
 					description={
 						"As a local woodworker, I'd be happy to lead this repair effort. I can first assess all the benches to create a precise materials list—we'll need specific types of treated lumber and rust-proof hardware. Once we have the supplies, I can host a weekend workshop at the park to guide volunteers in safely cutting, assembling, and sealing the new bench slats. We'll get them fixed properly and built to last."
 					}
-					eventsLabel="2 events"
-					costLabel="~1.500€"
-					durationLabel="3 days"
 					votesCount={3}
 				/>
 
-				{/* CTA: Got a better idea? */}
-				<div className="mt-[10px]">
-					<p className="font-display text-[16px] leading-[1.25]">Got a better idea?</p>
-					<button
-						type="button"
-						onClick={() => router.push(`/ideas/add?problemId=${problem.id}`)}
-						className="mt-2 inline-flex h-[60px] w-full items-center justify-center gap-2 rounded-full text-[16px]"
-						style={{
-							backgroundImage:
-								"linear-gradient(90deg, rgba(255,132,0,1) 0%, rgba(255,47,0,1) 100%)",
-						}}
-					>
-						<Plus size={20} className="text-white" />
-						<span>Add your idea</span>
-					</button>
+				{/* Sticky CTA: Add your idea */}
+				<div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 px-4 pb-6 sm:px-6">
+					<div className="mx-auto w-full max-w-[380px]">
+						<button
+							type="button"
+							onClick={() => router.push(`/ideas/add?problemId=${problem.id}`)}
+							className="pointer-events-auto inline-flex w-full items-center justify-center gap-2 rounded-full border-4 border-[#FF8400] bg-[#212121] px-6 py-3 text-[16px] text-white"
+						>
+							<Plus size={18} />
+							<span>Add your idea</span>
+						</button>
+					</div>
 				</div>
 			</main>
 		</div>

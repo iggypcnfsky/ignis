@@ -401,3 +401,30 @@ This component is intentionally client-only and isolated so we can later swap th
 - **Future integration**:
   - Replace hardcoded ideas with real data (e.g., `ideas` table filtered by `problem_id`).
   - Persist upvotes server-side with abuse controls; store per-profile vote state and expose an aggregate count.
+
+## Detailed Idea View
+
+- **Route & File**: `src/app/problems/[problemId]/ideas/[ideaId]/page.tsx`
+- **Design reference**: Figma “Detailed Idea” frame ([Figma design](https://www.figma.com/design/gDQlVbqZDapQJquKbyzbJ9/Ignis?node-id=3-343&t=kCdORPuVNEdl1u7n-4)).
+- **Header**:
+  - Centered `LogoSymbol` is absolutely positioned to remain centered regardless of side actions.
+  - Left: Back button to Ideas list.
+  - Right: two actions inline — `Upvote` (icon + count, no text label) and `Flag` (circular). Upvote uses orange→red gradient when active.
+- **Navigation**: `ProblemPillNav` with `active="ideas"`; bottom margin added so content does not overlap.
+- **Layout** (mobile-first, 402px content width baseline):
+  - Subtle glow ellipses to match the design system.
+  - `Idea` section: body text paragraph.
+  - `Media` section: two images with rounded corners (`next/image`).
+  - `Plan` section: seven steps. Each step is a 2-column row (index chip + text) with its own rounded background (`rounded-[15px] bg-[#353535] px-3 py-2`).
+  - `Costs & Resources`: list rows with rounded pill container and amount chips; total shown at bottom-right.
+  - `Author`: two equal panels — left is a contained profile image (no overflow beyond the card), right is bio + contact.
+  - `Meetups` blurb: informational card matching the design tone.
+- **Sticky CTA**: bottom-aligned button “Organize meetup about this idea”
+  - Width constrained to match `ProblemPillNav` (`max-w-[380px]`).
+  - Style: rounded, `border-4` in `#FF8400`, background `#212121`, white text, with `Users` icon from `lucide-react`.
+  - Page content adds extra bottom padding so the CTA never overlaps content.
+- **Interactions**:
+  - Upvote toggles the local count and gradient state (placeholder; to be wired to backend later).
+  - Flag toggles local state (placeholder for moderation/report flow).
+- **Data**:
+  - Presently uses static copy and demo images. Future work: load idea content by `ideaId` and map to `ideas` storage.
