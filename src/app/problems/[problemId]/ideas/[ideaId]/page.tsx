@@ -92,9 +92,7 @@ export default function DetailedIdeaPage() {
 			</div>
 
 				<main className="mx-auto h-full w-full max-w-[402px] px-4 pt-[152px] pb-[120px] sm:px-6">
-				{/* Glow ellipses */}
-				<div aria-hidden className="pointer-events-none absolute left-[234px] top-[-26px] h-[332px] w-[269px] rounded-full" style={{ backgroundColor: "rgba(255,132,0,0.8)", filter: "blur(300px)" }} />
-				<div aria-hidden className="pointer-events-none absolute left-[-150px] top-[905px] h-[640px] w-[269px] rounded-full" style={{ backgroundColor: "rgba(255,132,0,0.8)", filter: "blur(300px)" }} />
+				{/* Background glows removed per request */}
 
 				{/* Idea section */}
 				<section className="rounded-[30px] bg-[#212121] p-4">
