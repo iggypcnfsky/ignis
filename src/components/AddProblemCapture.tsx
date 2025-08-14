@@ -1,12 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Upload, Scan, X, ArrowRight, RefreshCw, ChevronLeft, Trash2, ScanEye } from "lucide-react";
 import LogoSymbol from "@/components/Logo";
 
 type CaptureKind = "photo"; // Extend later to include "video"
 
-export default function AddProblemCapture() {
+export default function AddProblemCapture({
+  autoOpen = false,
+  hideTrigger = false,
+  onClose,
+  onViewProblem,
+}: {
+  autoOpen?: boolean;
+  hideTrigger?: boolean;
+  onClose?: () => void;
+  onViewProblem?: (problemId: string) => void;
+}) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -18,6 +30,8 @@ export default function AddProblemCapture() {
   const [selectedMediaUrls, setSelectedMediaUrls] = useState<string[]>([]);
   const [descriptionText, setDescriptionText] = useState("");
   const [isUploadingBg, setIsUploadingBg] = useState(false);
+  const [createdProblemId, setCreatedProblemId] = useState<string | null>(null);
+  const hasAutoOpenedRef = useRef(false);
 
   const stopStream = useCallback(() => {
     if (streamRef.current) {
@@ -77,13 +91,22 @@ export default function AddProblemCapture() {
     setDescriptionText("");
     setStep("camera");
     stopStream();
-  }, [stopStream]);
+    if (onClose) onClose();
+  }, [stopStream, onClose]);
 
   useEffect(() => {
     return () => {
       stopStream();
     };
   }, [stopStream]);
+
+  // Auto-open camera once when used as a dedicated route
+  useEffect(() => {
+    if (autoOpen && !isOpen && !hasAutoOpenedRef.current) {
+      hasAutoOpenedRef.current = true;
+      void openCamera();
+    }
+  }, [autoOpen, isOpen, openCamera]);
 
   const handleTrigger = useCallback(() => {
     void openCamera();
@@ -199,20 +222,25 @@ export default function AddProblemCapture() {
   const submitProblemPlaceholder = useCallback(async () => {
     // eslint-disable-next-line no-console
     console.log("[submit-placeholder] Add problem:", { descriptionText, selectedMediaUrls });
+    // Simulate created problem id (fallback to demo problem id for now)
+    const newId = "p1";
+    setCreatedProblemId(newId);
     setStep("congrats");
   }, [descriptionText, selectedMediaUrls]);
 
   return (
     <>
       {/* Trigger button (center plus) */}
-      <button
-        type="button"
-        aria-label="Add problem"
-        onClick={handleTrigger}
-        className="absolute left-1/2 top-1/2 z-20 flex h-[49px] w-[49px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10"
-      >
-        <Plus size={32} className="text-white" strokeWidth={4} />
-      </button>
+      {!hideTrigger && (
+        <button
+          type="button"
+          aria-label="Add problem"
+          onClick={handleTrigger}
+          className="absolute left-1/2 top-1/2 z-20 flex h-[49px] w-[49px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10"
+        >
+          <Plus size={32} className="text-white" strokeWidth={4} />
+        </button>
+      )}
 
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black">
@@ -240,7 +268,7 @@ export default function AddProblemCapture() {
           </div>
 
           {/* Bottom controls / forms */}
-          <div className="absolute inset-x-0 bottom-20 z-10 px-4 sm:px-6">
+          <div className="absolute inset-x-0 bottom-20 z-20 px-4 sm:px-6">
             <div className="relative mx-auto w-full max-w-[380px]">
               {step === "camera" ? (
                 <>
@@ -398,17 +426,43 @@ export default function AddProblemCapture() {
                   )}
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={closeOverlay}
-                  className="flex h-[60px] w-full items-center justify-center gap-2 rounded-[100px] text-white font-sans text-[16px] leading-none tracking-[-0.03em]"
-                  style={{
-                    backgroundImage: "linear-gradient(90deg, #FF8400 0%, #FF2F00 100%)",
-                  }}
-                >
-                  <ScanEye size={24} strokeWidth={2} />
-                  <span>See how it looks like</span>
-                </button>
+                <div className="flex flex-col gap-3 pointer-events-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // eslint-disable-next-line no-console
+                      console.log("[debug] See how it looks like clicked", {
+                        createdProblemId,
+                        hasOnViewProblem: Boolean(onViewProblem),
+                      });
+                      const targetId = createdProblemId ?? "p1";
+                      if (onViewProblem) {
+                        // eslint-disable-next-line no-console
+                        console.log("[debug] navigating via onViewProblem", { targetId });
+                        onViewProblem(targetId);
+                      } else {
+                        // eslint-disable-next-line no-console
+                        console.log("[debug] navigating via router.push", { targetId });
+                        router.push(`/problems/${targetId}`);
+                      }
+                    }}
+                    className="flex h-[60px] w-full items-center justify-center gap-2 rounded-[100px] text-white font-sans text-[16px] leading-none tracking-[-0.03em]"
+                    style={{
+                      backgroundImage: "linear-gradient(90deg, #FF8400 0%, #FF2F00 100%)",
+                    }}
+                  >
+                    <ScanEye size={24} strokeWidth={2} />
+                    <span>See how it looks like</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeOverlay}
+                    className="flex h-[48px] w-full items-center justify-center gap-2 rounded-[100px] text-white font-sans text-[14px] leading-none tracking-[-0.03em] backdrop-blur-[50px]"
+                    style={{ backgroundColor: "rgba(0,0,0,0.10)" }}
+                  >
+                    <span>Close</span>
+                  </button>
+                </div>
               )}
             </div>
 
@@ -422,7 +476,7 @@ export default function AddProblemCapture() {
 
           {/* Congrats content */}
           {step === "congrats" && (
-            <div className="absolute inset-x-0 top-[88px] bottom-[120px] z-10 px-4 sm:px-6">
+            <div className="absolute inset-x-0 top-[88px] bottom-[120px] z-10 px-4 sm:px-6 pointer-events-none">
               <div className="mx-auto flex h-full w-full max-w-[380px] flex-col items-center justify-start gap-6">
                 {/* Stylized preview */}
                 <div className="relative mt-2 h-[316px] w-[316px]">

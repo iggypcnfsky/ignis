@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import LogoSymbol from "@/components/Logo";
-import { Compass, CalendarDays, Info } from "lucide-react";
-import AddProblemCapture from "@/components/AddProblemCapture";
+import { Compass, CalendarDays, Info, Plus } from "lucide-react";
 import { demoProblems, type Problem } from "@/lib/demoProblems";
 
 
@@ -79,7 +78,13 @@ export default function Home() {
       <div className="fixed inset-x-0 bottom-6 z-20 px-4 sm:px-6">
         <div className="relative mx-auto w-full max-w-[380px]">
           <div className="h-20 w-full rounded-[100px] bg-black/20 backdrop-blur-[50px]" />
-          <AddProblemCapture />
+          <Link
+            href="/problems/add"
+            aria-label="Add problem"
+            className="absolute left-1/2 top-1/2 z-20 flex h-[49px] w-[49px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10"
+          >
+            <Plus size={32} className="text-white" strokeWidth={4} />
+          </Link>
           <div className="absolute left-0 top-1/2 -translate-y-1/2">
             <button
               type="button"

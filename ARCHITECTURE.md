@@ -383,3 +383,21 @@ This component is intentionally client-only and isolated so we can later swap th
 - **Discover integration**: `src/app/page.tsx` makes each slide clickable (full-slide `Link`) to open `/problems/[id]`.
 - **Demo data**: Shared demo problems live in `src/lib/demoProblems.ts` for reuse across pages.
 - **Design reference**: Figma “Detailed Problem” frame ([Figma design](https://www.figma.com/design/gDQlVbqZDapQJquKbyzbJ9/Ignis?node-id=3-146&t=kCdORPuVNEdl1u7n-4)).
+
+## Ideas for Problem View
+
+- **Route & File**: `src/app/problems/[problemId]/ideas/page.tsx`
+- **Navigation**: Uses `src/components/ProblemPillNav.tsx` with `active="ideas"` to stay consistent with the Problem view header.
+- **Layout**:
+  - Mirrors the Figma “Ideas for Problem” frame with a dark panel, corner radius, subtle background glow, and two idea cards in the MVP.
+  - Width and paddings follow the 402px mobile design baseline; content is centered and scrollable under a fixed header.
+- **Idea Card**: `src/components/IdeaCard.tsx`
+  - Displays idea body text and three metric pills: events, cost, duration.
+  - Upvote control is a floating pill placed outside the text panel at the top-right. It shows the count and an arrow icon in a single control.
+  - Upvote behavior: toggles locally (first click +1 and turns orange gradient; second click −1 and returns to neutral); click is non-navigating even when the card is a link.
+  - Props: `description`, `eventsLabel`, `costLabel`, `durationLabel`, optional `votesCount`, optional `href`.
+- **CTA**: “Got a better idea?” button navigates to `/ideas/add?problemId=...` using the current `problemId`.
+- **Design reference**: Figma “Ideas for Problem” frame ([Figma design](https://www.figma.com/design/gDQlVbqZDapQJquKbyzbJ9/Ignis?node-id=3-240&t=kCdORPuVNEdl1u7n-4)).
+- **Future integration**:
+  - Replace hardcoded ideas with real data (e.g., `ideas` table filtered by `problem_id`).
+  - Persist upvotes server-side with abuse controls; store per-profile vote state and expose an aggregate count.
