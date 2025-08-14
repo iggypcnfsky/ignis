@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Plus, Upload, Scan, X, ArrowRight, RefreshCw, ChevronLeft, Trash2 } from "lucide-react";
+import { Plus, Upload, Scan, X, ArrowRight, RefreshCw, ChevronLeft, Trash2, ScanEye } from "lucide-react";
 import LogoSymbol from "@/components/Logo";
 
 type CaptureKind = "photo"; // Extend later to include "video"
@@ -10,7 +10,7 @@ export default function AddProblemCapture() {
   const [isOpen, setIsOpen] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [step, setStep] = useState<"camera" | "preview" | "description">("camera");
+  const [step, setStep] = useState<"camera" | "preview" | "description" | "congrats">("camera");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -199,6 +199,7 @@ export default function AddProblemCapture() {
   const submitProblemPlaceholder = useCallback(async () => {
     // eslint-disable-next-line no-console
     console.log("[submit-placeholder] Add problem:", { descriptionText, selectedMediaUrls });
+    setStep("congrats");
   }, [descriptionText, selectedMediaUrls]);
 
   return (
@@ -215,7 +216,8 @@ export default function AddProblemCapture() {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black">
-          {/* Camera/preview background */}
+          {/* Camera/preview background */
+          }
           <div className="absolute inset-0">
             {/* If camera/preview image, else subtle backdrop */}
             {step === "camera" ? (
@@ -223,9 +225,11 @@ export default function AddProblemCapture() {
             ) : step === "preview" && previewUrl ? (
               <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
             ) : (
-              <div className="h-full w-full bg-black" />
+              <div className="h-full w-full bg-[#141414]" />
             )}
-            <div className="absolute inset-0 bg-black/30" />
+            {(step === "camera" || step === "preview") && (
+              <div className="absolute inset-0 bg-black/30" />
+            )}
           </div>
 
           {/* Top bar with centered logo (same position as page header) */}
@@ -319,7 +323,7 @@ export default function AddProblemCapture() {
                     <span>Retake</span>
                   </button>
                 </div>
-              ) : (
+              ) : step === "description" ? (
                 <div className="flex flex-col gap-4">
                   {/* Header */}
                   <div className="px-1">
@@ -393,6 +397,18 @@ export default function AddProblemCapture() {
                     <div className="text-center text-xs text-white/60">Uploading media...</div>
                   )}
                 </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={closeOverlay}
+                  className="flex h-[60px] w-full items-center justify-center gap-2 rounded-[100px] text-white font-sans text-[16px] leading-none tracking-[-0.03em]"
+                  style={{
+                    backgroundImage: "linear-gradient(90deg, #FF8400 0%, #FF2F00 100%)",
+                  }}
+                >
+                  <ScanEye size={24} strokeWidth={2} />
+                  <span>See how it looks like</span>
+                </button>
               )}
             </div>
 
@@ -403,6 +419,38 @@ export default function AddProblemCapture() {
               </div>
             )}
           </div>
+
+          {/* Congrats content */}
+          {step === "congrats" && (
+            <div className="absolute inset-x-0 top-[88px] bottom-[120px] z-10 px-4 sm:px-6">
+              <div className="mx-auto flex h-full w-full max-w-[380px] flex-col items-center justify-start gap-6">
+                {/* Stylized preview */}
+                <div className="relative mt-2 h-[316px] w-[316px]">
+                  <div className="absolute -inset-4 rounded-full border-[15px] border-[#FF2F00] opacity-80 blur-[50px]" />
+                  <div className="absolute -inset-2 rounded-full border-[8px] border-[#FF8400] opacity-90 blur-[20px]" />
+                  <div className="relative h-full w-full overflow-hidden rounded-full bg-[#D9D9D9]">
+                    <img
+                      src={previewUrl || selectedMediaUrls[0]}
+                      alt="preview"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* Texts */}
+                <div className="px-2 text-center">
+                  <h1 className="font-display text-white text-[40px] leading-[1.05] text-center break-words">
+                    Congrats!
+                    <br />
+                    You’ve added new problem!
+                  </h1>
+                </div>
+                <p className="px-4 text-center font-display text-white text-[20px] leading-snug">
+                  Thanks to people like you we can make this world better!
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>

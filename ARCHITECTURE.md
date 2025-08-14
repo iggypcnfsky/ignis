@@ -318,3 +318,68 @@ Each feature owns UI, validation (Zod), and data adapters. Cross-feature contrac
 This document should be kept current as modules, schema, and policies evolve.
 
 
+
+---
+
+## Add Problem Capture Component
+
+`src/components/AddProblemCapture.tsx` implements the mobile-first capture and submit flow for new problems. It is invoked from the center Plus control on the Discover screen (`src/app/page.tsx`). The component mirrors the provided Figma designs for camera, confirmation, description, and congrats screens.
+
+- **Design references**
+  - Camera/trigger: `Add Problem / Camera` (node 3:1015)
+  - Preview/confirm: `Add Problem / Confirm` (node 51:98)
+  - Description: `Add Problem / Description` (node 3:1040)
+  - Congrats: `Add Problem / Congrats` (node 3:1056)
+  - Figma file: `Ignis`
+
+- **States (finite state machine)**
+  - `camera`: Requests camera (`getUserMedia`) with environment-facing lens; shows Upload (left), Scan (center), Close (right).
+  - `preview`: Shows captured/uploaded media with actions `Continue` (primary) and `Retake`.
+  - `description`: Dark background; header “What’s the problem?”, rounded textarea, horizontal media strip (thumbnails with per-item delete), Add-more tile, and primary CTA “Add this problem”. Top-left Back arrow returns to `camera`.
+  - `congrats`: Stylized circular media preview, display headline, subtext, and CTA “See how it looks like” that closes overlay and returns to Discover.
+
+- **Key handlers**
+  - `openCamera()`: Mounts overlay, waits for video to mount, requests stream, assigns to `<video>`, waits `loadedmetadata`, then `play()`.
+  - `captureFrame("photo")`: Draws current frame to a canvas and creates a Blob URL for preview.
+  - `onFilesSelected()` and `onMoreFilesSelected()`: Generate object URLs for selected files; appended to `selectedMediaUrls` in description.
+  - `handleRetake()`: Revokes preview URL(s), restarts stream, returns to `camera`.
+  - `startBackgroundUpload(urls)`: Placeholder async that simulates background upload after `Continue`.
+  - `submitProblemPlaceholder()`: Placeholder submit from description; transitions to `congrats`.
+  - `closeOverlay()`: Cleans up streams and revokes any object URLs, resets state, returns to page.
+
+- **Memory & stream cleanup**
+  - All created object URLs are revoked on replacement and teardown.
+  - MediaStream tracks are stopped on leaving camera or when overlay closes.
+
+- **Styling & typography**
+  - Icons from `lucide-react` (`Scan`, `Upload`, `X`, `RefreshCw`, `ArrowRight`, `ChevronLeft`, `ScanEye`).
+  - Display headlines use Caprasimo via `.font-display`; body text uses DM Sans (`font-sans` is mapped in `globals.css`).
+  - Gradients and blur match Figma tokens (orange→red gradients for primaries, dark translucent with blur for secondary actions).
+
+- **Integration points (future)**
+  - Replace `startBackgroundUpload` with a real uploader (Supabase Storage bucket `media`) and persist a draft Problem row.
+  - Replace `submitProblemPlaceholder` with creation of a `problems` row and navigation to `/problems/[problemId]`.
+  - Optionally store in-flight media and draft data in a lightweight client store (e.g., Zustand) to survive navigations.
+
+- **Accessibility**
+  - Buttons are keyboard-focusable; ensure labels convey action (aria-labels can be extended).
+  - Consider adding haptic/animations per Motion System, but keep core interactions usable without them.
+
+This component is intentionally client-only and isolated so we can later swap the background upload and submit with real APIs without changing the UI contract.
+
+## Detailed Problem View
+
+- **Route & File**: `src/app/problems/[problemId]/page.tsx`
+- **Header**: Fixed header mirrors Discover with centered `LogoSymbol` and a left back button to return to Discover.
+- **Navigation**: Reusable pill component `src/components/ProblemPillNav.tsx` with routes:
+  - `Problem` → `/problems/[id]`
+  - `Ideas` → `/problems/[id]/ideas`
+  - `Meet` → `/problems/[id]/meetups`
+  - `Share` → `/problems/[id]/share`
+  - `Chat` → `/problems/[id]/chat`
+- **Layout**:
+  - Mobile: stacked cards (hero image → report/description → poll → similar problems) following the Figma design.
+  - Desktop: responsive grid (`lg:grid-cols-12`) placing hero on the left (7 cols) and description + poll on the right (5 cols); similar problems flow in a 3-column grid below.
+- **Discover integration**: `src/app/page.tsx` makes each slide clickable (full-slide `Link`) to open `/problems/[id]`.
+- **Demo data**: Shared demo problems live in `src/lib/demoProblems.ts` for reuse across pages.
+- **Design reference**: Figma “Detailed Problem” frame ([Figma design](https://www.figma.com/design/gDQlVbqZDapQJquKbyzbJ9/Ignis?node-id=3-146&t=kCdORPuVNEdl1u7n-4)).
