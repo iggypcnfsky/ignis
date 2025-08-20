@@ -14,7 +14,7 @@ export default function DetailedIdeaPage() {
 	const problemId = Array.isArray(params?.problemId)
 		? params?.problemId[0]
 		: params?.problemId;
-	const ideaId = Array.isArray(params?.ideaId) ? params?.ideaId[0] : params?.ideaId;
+	// const ideaId = Array.isArray(params?.ideaId) ? params?.ideaId[0] : params?.ideaId; // TODO: Use for dynamic content loading
 
 	const problem = useMemo(() => {
 		return demoProblems.find((p) => p.id === problemId) ?? demoProblems[0];

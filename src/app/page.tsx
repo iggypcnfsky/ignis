@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import LogoSymbol from "@/components/Logo";
 import SharedHeader from "@/components/SharedHeader";
 import { Info, Plus } from "lucide-react";
 import { demoProblems, type Problem } from "@/lib/demoProblems";
@@ -44,37 +43,115 @@ function ProblemSlide({ problem }: { problem: Problem }) {
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [infoBarBottom, setInfoBarBottom] = useState(160);
+  const [votes, setVotes] = useState<Record<string, { yes: number; no: number }>>({});
+  const [userVotes, setUserVotes] = useState<Record<string, 'yes' | 'no' | null>>({});
 
-  // Show initial slide text on mount
-  useEffect(() => {
-    const infoBar = document.getElementById('info-bar') as HTMLElement;
-    const questionText = document.getElementById('question-text') as HTMLElement;
-
-    if (infoBar && questionText) {
-      infoBar.style.opacity = '1';
-      questionText.style.opacity = '1';
+  const handleVote = (problemId: string, voteType: 'yes' | 'no') => {
+    const currentVote = userVotes[problemId];
+    
+    // Initialize votes for this problem if they don't exist
+    if (!votes[problemId]) {
+      setVotes(prev => ({
+        ...prev,
+        [problemId]: { yes: 0, no: 0 }
+      }));
     }
+
+    setVotes(prev => {
+      const currentVotes = prev[problemId] || { yes: 0, no: 0 };
+      const newVotes = { ...currentVotes };
+
+      // Remove previous vote if exists
+      if (currentVote === 'yes') newVotes.yes = Math.max(0, newVotes.yes - 1);
+      if (currentVote === 'no') newVotes.no = Math.max(0, newVotes.no - 1);
+
+      // Add new vote
+      if (voteType === 'yes') newVotes.yes += 1;
+      if (voteType === 'no') newVotes.no += 1;
+
+      return {
+        ...prev,
+        [problemId]: newVotes
+      };
+    });
+
+    // Update user's vote
+    setUserVotes(prev => ({
+      ...prev,
+      [problemId]: currentVote === voteType ? null : voteType
+    }));
+  };
+
+  // Show initial slide text on mount and set up resize observer
+  useEffect(() => {
+    const showElements = () => {
+      const infoBar = document.getElementById('info-bar') as HTMLElement;
+      const questionText = document.getElementById('question-text') as HTMLElement;
+
+      if (infoBar && questionText) {
+        infoBar.style.opacity = '1';
+        questionText.style.opacity = '1';
+        
+        // Initial position calculation
+        const questionHeight = questionText.offsetHeight;
+        const baseQuestionBottom = 80;
+        const spacing = 20;
+        const newInfoBarBottom = baseQuestionBottom + questionHeight + spacing;
+        setInfoBarBottom(newInfoBarBottom);
+      }
+    };
+
+    // Small delay to ensure DOM is ready
+    const timeout = setTimeout(showElements, 100);
+    
+    // Set up resize observer to recalculate on window resize
+    const resizeObserver = new ResizeObserver(() => {
+      const questionElement = document.getElementById('question-text') as HTMLElement;
+      if (questionElement) {
+        const questionHeight = questionElement.offsetHeight;
+        const baseQuestionBottom = 80;
+        const spacing = 20;
+        const newInfoBarBottom = baseQuestionBottom + questionHeight + spacing;
+        setInfoBarBottom(newInfoBarBottom);
+      }
+    });
+
+    const questionElement = document.getElementById('question-text') as HTMLElement;
+    if (questionElement) {
+      resizeObserver.observe(questionElement);
+    }
+
+    return () => {
+      clearTimeout(timeout);
+      resizeObserver.disconnect();
+    };
   }, []);
 
   // Monitor current slide changes for question updates
   useEffect(() => {
-    // Question will automatically update based on currentSlide state
+    // Calculate dynamic positioning after question updates
+    const updateInfoBarPosition = () => {
+      const questionElement = document.getElementById('question-text') as HTMLElement;
+      if (questionElement) {
+        const questionHeight = questionElement.offsetHeight;
+        const baseQuestionBottom = 80; // bottom-[80px] = 320px from bottom
+        const spacing = 20; // Desired spacing between question and info bar
+        const newInfoBarBottom = baseQuestionBottom + questionHeight + spacing;
+        setInfoBarBottom(newInfoBarBottom);
+      }
+    };
+
+    // Small delay to ensure DOM has updated
+    const timeout = setTimeout(updateInfoBarPosition, 50);
+    return () => clearTimeout(timeout);
   }, [currentSlide]);
 
   useEffect(() => {
     let scrollTimeout: NodeJS.Timeout;
     let isScrolling = false;
 
-    let lastScrollTime = 0;
-    const scrollThrottle = 100; // Simple throttle
-
     const handleScroll = () => {
-      const now = Date.now();
-      if (now - lastScrollTime < scrollThrottle) {
-        return; // Throttle scroll events
-      }
-      lastScrollTime = now;
-
       const main = document.getElementById('problems-scroll-container') as HTMLElement;
       if (!main || isScrolling) {
         return;
@@ -95,51 +172,39 @@ export default function Home() {
         // Update current slide state
         setCurrentSlide(currentSlideIndex);
 
-        // Simple show/hide without animation
+        // Simplified visibility logic
         if (infoBar && questionText) {
-          // Calculate how far we are from the current slide center
-          const slideCenter = currentSlideIndex * slideHeight + slideHeight / 2;
-          const distanceFromCenter = Math.abs(scrollTop + slideHeight / 2 - slideCenter);
-          const maxDistance = slideHeight * 0.3; // Fade out when 30% away from center
+          // Calculate distance from the exact slide position
+          const targetScrollPosition = currentSlideIndex * slideHeight;
+          const distanceFromTarget = Math.abs(scrollTop - targetScrollPosition);
+          const threshold = slideHeight * 0.1; // Show when within 10% of target position
 
-          const progress = Math.min(distanceFromCenter / maxDistance, 1);
-
-          if (progress < 0.2) {
-            // Near center - show elements immediately
+          if (distanceFromTarget < threshold) {
+            // Near the slide position - show elements
             infoBar.style.opacity = '1';
             questionText.style.opacity = '1';
           } else {
-            // Away from center - hide elements immediately
+            // Far from slide position - hide elements
             infoBar.style.opacity = '0';
             questionText.style.opacity = '0';
           }
         }
 
         isScrolling = false;
-      }, 150); // Simple delay
+      }, 100);
     };
 
-    // Wait for DOM to be ready
-    const initializeScroll = () => {
-      const main = document.getElementById('problems-scroll-container') as HTMLElement;
-      if (main) {
-        main.addEventListener('scroll', handleScroll, { passive: true });
-        return () => {
-          main.removeEventListener('scroll', handleScroll);
-          clearTimeout(scrollTimeout);
-        };
-      } else {
-        setTimeout(initializeScroll, 100);
-      }
-    };
-
-    // Initialize after component mounts
-    setTimeout(() => {
-      initializeScroll();
-    }, 100);
+    // Initialize scroll listener
+    const main = document.getElementById('problems-scroll-container') as HTMLElement;
+    if (main) {
+      main.addEventListener('scroll', handleScroll, { passive: true });
+    }
 
     return () => {
       clearTimeout(scrollTimeout);
+      if (main) {
+        main.removeEventListener('scroll', handleScroll);
+      }
     };
   }, []);
 
@@ -151,7 +216,7 @@ export default function Home() {
       {/* Scrollable backgrounds */}
       <main
         id="problems-scroll-container"
-        className="w-full overflow-y-auto snap-y snap-mandatory"
+        className="w-full overflow-y-auto snap-y snap-mandatory scrollbar-hide"
         style={{
           scrollSnapType: 'y mandatory',
           scrollPadding: '0',
@@ -170,8 +235,8 @@ export default function Home() {
       {/* Fixed info bar above question */}
       <div
         id="info-bar"
-        className="fixed inset-x-0 bottom-[154px] z-10 flex items-center justify-center px-6"
-        style={{ opacity: 0 }}
+        className="fixed inset-x-0 z-10 flex items-center justify-center px-6 transition-all duration-300 ease-out"
+        style={{ opacity: 0, bottom: `${infoBarBottom}px` }}
       >
         <div className="flex items-center justify-center gap-1.5">
           <Info size={14} className="text-white" strokeWidth={1.2} />
@@ -184,10 +249,10 @@ export default function Home() {
       {/* Fixed question text */}
       <div
         id="question-text"
-        className="fixed inset-x-0 bottom-[88px] z-10 px-6"
+        className="fixed inset-x-0 bottom-[80px] z-10 transition-opacity duration-300 ease-out flex justify-center"
         style={{ opacity: 0 }}
       >
-        <p className={`font-display mx-auto text-center text-white text-[30px] leading-none`}>
+        <p className={`font-display text-center text-white text-[30px] leading-tight pb-5`} style={{ width: '50vw' }}>
           {demoProblems[currentSlide]?.question || demoProblems[0].question}
         </p>
       </div>
@@ -203,27 +268,55 @@ export default function Home() {
           >
             <Plus size={24} className="text-white" strokeWidth={4} />
           </Link>
+          
+          {/* Yes Button */}
           <div className="absolute left-1/2 top-1/2 -translate-x-[85px] -translate-y-1/2">
-            <button
-              type="button"
-              className={`h-10 w-10 rounded-full text-white text-[12px] font-medium flex items-center justify-center`}
-              style={{
-                backgroundImage: "linear-gradient(180deg, #FF8400 0%, #FF2F00 100%)",
-              }}
-            >
-              Yes
-            </button>
+            <div className="flex flex-col items-center">
+              <button
+                type="button"
+                onClick={() => handleVote(demoProblems[currentSlide]?.id || demoProblems[0].id, 'yes')}
+                className={`h-10 w-10 rounded-full text-white text-[12px] font-medium flex items-center justify-center transition-all duration-200 ${
+                  userVotes[demoProblems[currentSlide]?.id || demoProblems[0].id] === 'yes' 
+                    ? 'scale-110' 
+                    : 'hover:scale-105'
+                }`}
+                style={{
+                  backgroundImage: "linear-gradient(180deg, #FF8400 0%, #FF2F00 100%)",
+                }}
+              >
+                Yes
+              </button>
+              {votes[demoProblems[currentSlide]?.id || demoProblems[0].id]?.yes > 0 && (
+                <span className="mt-1 text-[10px] text-white/60 font-medium">
+                  {votes[demoProblems[currentSlide]?.id || demoProblems[0].id].yes}
+                </span>
+              )}
+            </div>
           </div>
+          
+          {/* No Button */}
           <div className="absolute right-1/2 top-1/2 translate-x-[85px] -translate-y-1/2">
-            <button
-              type="button"
-              className={`h-10 w-10 rounded-full text-[#BABABA] text-[12px] font-medium flex items-center justify-center`}
-              style={{
-                backgroundImage: "linear-gradient(180deg, #2B2B2B 0%, #000000 100%)",
-              }}
-            >
-              No
-            </button>
+            <div className="flex flex-col items-center">
+              <button
+                type="button"
+                onClick={() => handleVote(demoProblems[currentSlide]?.id || demoProblems[0].id, 'no')}
+                className={`h-10 w-10 rounded-full text-[#BABABA] text-[12px] font-medium flex items-center justify-center transition-all duration-200 ${
+                  userVotes[demoProblems[currentSlide]?.id || demoProblems[0].id] === 'no' 
+                    ? 'scale-110' 
+                    : 'hover:scale-105'
+                }`}
+                style={{
+                  backgroundImage: "linear-gradient(180deg, #2B2B2B 0%, #000000 100%)",
+                }}
+              >
+                No
+              </button>
+              {votes[demoProblems[currentSlide]?.id || demoProblems[0].id]?.no > 0 && (
+                <span className="mt-1 text-[10px] text-white/60 font-medium">
+                  {votes[demoProblems[currentSlide]?.id || demoProblems[0].id].no}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

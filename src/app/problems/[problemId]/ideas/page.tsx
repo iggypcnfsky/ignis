@@ -1,10 +1,10 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
-import LogoSymbol from "@/components/Logo";
-import { ChevronLeft, Plus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Plus } from "lucide-react";
 import ProblemPillNav from "@/components/ProblemPillNav";
+import SharedHeader from "@/components/SharedHeader";
 import IdeaCard from "@/components/IdeaCard";
 import { demoProblems } from "@/lib/demoProblems";
 
@@ -16,100 +16,185 @@ export default function ProblemIdeasPage() {
 		: params?.problemId;
 	const problem = demoProblems.find((p) => p.id === problemId) ?? demoProblems[0];
 
+	const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+	const observerRef = useRef<IntersectionObserver | null>(null);
+
+	useEffect(() => {
+		observerRef.current = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						const cardId = entry.target.getAttribute('data-card-id');
+						if (cardId) {
+							setVisibleCards(prev => new Set([...prev, cardId]));
+						}
+					}
+				});
+			},
+			{
+				threshold: 0.1,
+				rootMargin: '50px'
+			}
+		);
+
+		// Show initially visible cards after a short delay
+		const timeout = setTimeout(() => {
+			const initiallyVisible = new Set(['idea-1', 'idea-2', 'idea-3', 'idea-4', 'idea-5', 'idea-6']);
+			setVisibleCards(initiallyVisible);
+		}, 100);
+
+		return () => {
+			clearTimeout(timeout);
+			if (observerRef.current) {
+				observerRef.current.disconnect();
+			}
+		};
+	}, []);
+
+	const cardRef = (element: HTMLDivElement | null, cardId: string) => {
+		if (element && observerRef.current) {
+			element.setAttribute('data-card-id', cardId);
+			observerRef.current.observe(element);
+		}
+	};
+
 	return (
 		<div className="relative min-h-dvh w-full bg-[#141414] text-white">
-			{/* Fixed header with centered logo and back button */}
-			<div className="relative z-10 px-6 pt-16 pb-4">
-			<div className="flex items-center justify-between mb-8">
-				<button
-					type="button"
-					onClick={() => router.push(`/problems/${problem.id}`)}
-					aria-label="Back to Problem"
-					className="flex items-center justify-center w-10 h-10 rounded-full bg-[rgba(36,36,36,0.3)] backdrop-blur-[100px]"
-				>
-					<ChevronLeft size={20} className="text-white" strokeWidth={1.7} />
-				</button>
-				<div className="absolute left-1/2 transform -translate-x-1/2">
-					            <Link
-              href="/"
-              aria-label="Go to explore page"
-              className="flex items-center justify-center"
-            >
-              <LogoSymbol size={24} className="text-white" />
-            </Link>
-				</div>
-				<div className="w-10 h-10" />
+			{/* Shared Header */}
+			<SharedHeader mode="back" backHref={`/problems/${problem.id}`} />
+			
+			{/* Navigation */}
+			<div className="relative z-10 px-3 pt-20 pb-2">
+				<ProblemPillNav problemId={problem.id} active="ideas" />
 			</div>
-			<ProblemPillNav problemId={problem.id} active="ideas" />
-		</div>
 
-		<main className="px-6 pb-32">
+		<main className="px-3 pb-16">
 				{/* Background glow removed */}
 
-				<div className="space-y-3">
+				<div className="space-y-4">
 					{/* First idea card */}
-					<IdeaCard
-						className=""
-						href={`/problems/${problem.id}/ideas/idea-1`}
-						description={
-							"We could launch a 'Sponsor-a-Bench' program. Local businesses and families could fund a new, durable bench in exchange for a small dedication plaque. To foster community spirit, we could also organize a 'Park Pride Day' where volunteers help assemble and install the new benches, and maybe even give the existing ones a fresh coat of paint. This would be a great way to get everyone involved in improving our park."
-						}
-						votesCount={12}
-					/>
+					<div
+						ref={(el) => cardRef(el, 'idea-1')}
+						className={`transform transition-all duration-700 ease-out ${
+							visibleCards.has('idea-1') 
+								? 'opacity-100 translate-y-0' 
+								: 'opacity-0 translate-y-8'
+						}`}
+						style={{ transitionDelay: '0ms' }}
+					>
+						<IdeaCard
+							className=""
+							href={`/problems/${problem.id}/ideas/idea-1`}
+							description={
+								"We could launch a 'Sponsor-a-Bench' program. Local businesses and families could fund a new, durable bench in exchange for a small dedication plaque. To foster community spirit, we could also organize a 'Park Pride Day' where volunteers help assemble and install the new benches, and maybe even give the existing ones a fresh coat of paint. This would be a great way to get everyone involved in improving our park."
+							}
+							votesCount={12}
+						/>
+					</div>
 
 					{/* Second idea card */}
-					<IdeaCard
-						className=""
-						href={`/problems/${problem.id}/ideas/idea-2`}
-						description={
-							"As a local woodworker, I'd be happy to lead this repair effort. I can first assess all the benches to create a precise materials list—we'll need specific types of treated lumber and rust-proof hardware. Once we have the supplies, I can host a weekend workshop at the park to guide volunteers in safely cutting, assembling, and sealing the new bench slats. We'll get them fixed properly and built to last."
-						}
-						votesCount={3}
-					/>
+					<div
+						ref={(el) => cardRef(el, 'idea-2')}
+						className={`transform transition-all duration-700 ease-out ${
+							visibleCards.has('idea-2') 
+								? 'opacity-100 translate-y-0' 
+								: 'opacity-0 translate-y-8'
+						}`}
+						style={{ transitionDelay: '100ms' }}
+					>
+						<IdeaCard
+							className=""
+							href={`/problems/${problem.id}/ideas/idea-2`}
+							description={
+								"As a local woodworker, I'd be happy to lead this repair effort. I can first assess all the benches to create a precise materials list—we'll need specific types of treated lumber and rust-proof hardware. Once we have the supplies, I can host a weekend workshop at the park to guide volunteers in safely cutting, assembling, and sealing the new bench slats. We'll get them fixed properly and built to last."
+							}
+							votesCount={3}
+						/>
+					</div>
 
 					{/* Third idea card (demo) */}
-					<IdeaCard
-						className=""
-						href={`/problems/${problem.id}/ideas/idea-3`}
-						description={
-							"Partner with the local high school shop class to rebuild benches as a semester project. Students gain hands-on experience while the park receives durable replacements at minimal cost."
-						}
-						votesCount={8}
-					/>
+					<div
+						ref={(el) => cardRef(el, 'idea-3')}
+						className={`transform transition-all duration-700 ease-out ${
+							visibleCards.has('idea-3') 
+								? 'opacity-100 translate-y-0' 
+								: 'opacity-0 translate-y-8'
+						}`}
+						style={{ transitionDelay: '200ms' }}
+					>
+						<IdeaCard
+							className=""
+							href={`/problems/${problem.id}/ideas/idea-3`}
+							description={
+								"Partner with the local high school shop class to rebuild benches as a semester project. Students gain hands-on experience while the park receives durable replacements at minimal cost."
+							}
+							votesCount={8}
+						/>
+					</div>
 
 					{/* Fourth idea card (demo) */}
-					<IdeaCard
-						className=""
-						href={`/problems/${problem.id}/ideas/idea-4`}
-						description={
-							"Host a community fundraiser and adopt-a-bench drive with a public tracker. Each sponsored bench includes a small engraved tag acknowledging contributors."
-						}
-						votesCount={15}
-					/>
+					<div
+						ref={(el) => cardRef(el, 'idea-4')}
+						className={`transform transition-all duration-700 ease-out ${
+							visibleCards.has('idea-4') 
+								? 'opacity-100 translate-y-0' 
+								: 'opacity-0 translate-y-8'
+						}`}
+						style={{ transitionDelay: '300ms' }}
+					>
+						<IdeaCard
+							className=""
+							href={`/problems/${problem.id}/ideas/idea-4`}
+							description={
+								"Host a community fundraiser and adopt-a-bench drive with a public tracker. Each sponsored bench includes a small engraved tag acknowledging contributors."
+							}
+							votesCount={15}
+						/>
+					</div>
 
 					{/* Fifth idea card (demo) */}
-					<IdeaCard
-						className=""
-						href={`/problems/${problem.id}/ideas/idea-5`}
-						description={
-							"Switch to recycled-plastic lumber for future benches to reduce maintenance and extend lifespan. It resists rot and requires fewer replacements over time."
-						}
-						votesCount={21}
-					/>
+					<div
+						ref={(el) => cardRef(el, 'idea-5')}
+						className={`transform transition-all duration-700 ease-out ${
+							visibleCards.has('idea-5') 
+								? 'opacity-100 translate-y-0' 
+								: 'opacity-0 translate-y-8'
+						}`}
+						style={{ transitionDelay: '400ms' }}
+					>
+						<IdeaCard
+							className=""
+							href={`/problems/${problem.id}/ideas/idea-5`}
+							description={
+								"Switch to recycled-plastic lumber for future benches to reduce maintenance and extend lifespan. It resists rot and requires fewer replacements over time."
+							}
+							votesCount={21}
+						/>
+					</div>
 
 					{/* Sixth idea card (demo) */}
-					<IdeaCard
-						className=""
-						href={`/problems/${problem.id}/ideas/idea-6`}
-						description={
-							"Create a monthly 'Fix-It in the Park' meetup. Each session focuses on small repairs—starting with benches—building regular momentum and volunteer ownership."
-						}
-						votesCount={5}
-					/>
+					<div
+						ref={(el) => cardRef(el, 'idea-6')}
+						className={`transform transition-all duration-700 ease-out ${
+							visibleCards.has('idea-6') 
+								? 'opacity-100 translate-y-0' 
+								: 'opacity-0 translate-y-8'
+						}`}
+						style={{ transitionDelay: '500ms' }}
+					>
+						<IdeaCard
+							className=""
+							href={`/problems/${problem.id}/ideas/idea-6`}
+							description={
+								"Create a monthly 'Fix-It in the Park' meetup. Each session focuses on small repairs—starting with benches—building regular momentum and volunteer ownership."
+							}
+							votesCount={5}
+						/>
+					</div>
 				</div>
 
 				{/* Sticky CTA: Add your idea */}
-				<div className="sticky bottom-0 left-0 right-0 pb-8 z-5">
+				<div className="sticky bottom-0 left-0 right-0 pb-4 z-5">
 					<button
 						type="button"
 						onClick={() => router.push(`/ideas/add?problemId=${problem.id}`)}

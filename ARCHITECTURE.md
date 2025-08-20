@@ -76,7 +76,7 @@ This document captures the current architecture for the Ignis platform and evolv
 - **Sharing**: Web Share API when available; canonical deep links for copy/share.
 - **Image Interaction**: Hero images support click-to-zoom with full pan and zoom controls
 - **Responsive Design**: All layouts are fully flexible for desktop use with no width restrictions
-- **Panel System**: Content organized in rounded panels with consistent padding (p-6) and icon headers
+- **Panel System**: Content organized in rounded panels with consistent padding (p-3) and icon headers
 - **Horizontal Sliders**: Similar content displayed in touch-friendly horizontal sliders with scroll snap
 - **Visual Feedback**: Interactive elements include hover states, focus rings, and loading states
 
@@ -94,15 +94,17 @@ Route suggestions assume Next.js App Router under `src/app`.
 - **Add Problem Flow** (`/problems/add`)
   - Step 1: camera/upload → Step 2: describe → Step 3: congrats → navigate to created problem.
 - **Detailed Problem** (`/problems/[problemId]`)
+  - Universal `SharedHeader` in back mode with navigation to home
   - Interactive hero image with zoom/pan modal
   - Comprehensive report panel with calendar icon and timestamp
   - Visualized poll with dynamic vote proportion bars
   - Location panel with Google Maps placeholder
   - Horizontal slider for similar problems with square cards (160×160px)
   - All panels include relevant Lucide React icons
-  - Universal panel padding (p-6) for better breathing room
+  - Universal panel padding standardized to compact (p-3)
   - Actions (Share, Add Idea, See Meetups, Chat).
 - **Ideas for Problem** (`/problems/[problemId]/ideas`)
+  - Universal `SharedHeader` in back mode with navigation to problem details
   - Horizontal slider with idea cards featuring votes and visual metrics
   - Square card design (160×160px) with hover scale animations
   - Scroll snap for smooth navigation
@@ -114,7 +116,8 @@ Route suggestions assume Next.js App Router under `src/app`.
   - Media upload: Multiple images/videos with thumbnail preview, remove functionality, and drag-and-drop support.
   - Mobile-first design with horizontal scroll for multiple media items.
 - **Problem Meetups** (`/problems/[problemId]/meetups`)
-  - Clean, flexible layout with centered LogoSymbol
+  - Universal `SharedHeader` in back mode with navigation to problem details
+  - Clean, flexible layout with meetup cards
   - Meetup cards with status indicators (Live/Online)
   - Cards show participants, problems, ideas, and duration
   - Sticky CTA button for adding new meetups
@@ -124,9 +127,22 @@ Route suggestions assume Next.js App Router under `src/app`.
 - **Add Meetup Flow** (`/problems/[problemId]/meetups/add`)
   - Wizard: (1) agenda → (2) select idea(s)/none → (3) details + location/contact → (4) congrats → meetup view.
 - **Share Problem** (`/problems/[problemId]/share`)
+  - Universal `SharedHeader` in back mode with navigation to problem details
   - Deep link, QR code, A4 poster download (QR + description), copyable social post text.
 - **Problem Chat** (`/problems/[problemId]/chat`)
+  - Universal `SharedHeader` in back mode with navigation to problem details
   - Live chat with message bubbles; sticky input; realtime updates.
+- **Leaderboard** (`/leaderboard`)
+  - Universal `SharedHeader` in back mode with navigation to home
+  - User ranking system showing points, locations, and current user position
+  - Points breakdown: Problems (50pts), Ideas (100pts), Meetups (200pts), Chat messages (5pts)
+  - Interactive cards displaying user stats and achievements
+- **User Profile** (`/profile`)
+  - Universal `SharedHeader` in back mode with navigation to home
+  - Profile management with image upload, name/bio/location editing
+  - Activity summary showing user contributions and achievements
+  - Account management with logout and delete account options
+  - Privacy settings and notification preferences
 - **Onboarding Wizard (future)** (`/onboarding`)
   - Step-by-step intro to app features.
 - **Login/Register** (`/auth` or `/login`)
@@ -157,9 +173,106 @@ Recommended navigation: bottom primary actions (Add, Meetups, Discover) on mobil
 - **Enhanced Date Display**: Report dates include calendar icon with full timestamp
 - **Google Maps Integration Panel**: Dedicated location panel with map placeholder
 - **Responsive Similar Problems Slider**: Horizontal scroll with square cards (160×160px) and overflow clipped at panel level
-- **Universal Panel Padding**: Increased padding (p-6) for better breathing room
+- **Universal Panel Padding**: Standardized to compact (p-3)
 - **Clean Visual Hierarchy**: Removed distracting orange gradients and borders
 - **Mobile-Optimized Zoom Indicator**: Always-visible zoom icon for touch devices
+
+### Leaderboard & Gamification System
+
+The Leaderboard view (`/leaderboard`) provides a comprehensive ranking system to encourage user engagement through a points-based reward structure:
+
+**Points Structure**:
+- **Adding Problems**: 50 points - Encourages civic issue reporting
+- **Adding Ideas**: 100 points - Rewards solution contributions
+- **Creating/Organizing Meetups**: 200 points - Highest reward for community organizing
+- **Chat Engagement**: 5 points per message - Incentivizes discussion participation
+
+**Layout & Features**:
+- **Current User Highlight**: Prominently displays current user's rank and total points
+- **Ranking Cards**: User cards showing rank, points, location, and contribution breakdown
+- **Points Breakdown Panel**: Detailed explanation of how to earn points
+- **Location Display**: Shows user locations for community connection
+- **Achievement Indicators**: Visual badges or indicators for top contributors
+
+**Design Principles**:
+- Mobile-first design with card-based layout
+- Consistent with app's panel system (rounded corners, p-3 padding)
+- Uses Lucide React icons for visual hierarchy (Trophy, Medal, MapPin, Users)
+- Implements intersection observer animations for smooth content reveal
+- Accessible navigation via SharedHeader back button
+
+### User Profile Management System
+
+The User Profile view (`/profile`) provides comprehensive account management and personalization features accessible via the user button in the SharedHeader:
+
+**Profile Information Panel**:
+- **Profile Image**: Large circular avatar with upload/change functionality
+- **Basic Info**: Editable name, bio/description, and location fields
+- **User Status**: Shows account type (Guest vs Authenticated User)
+- **Join Date**: Displays when the user first started using the platform
+
+**Activity Summary Panel**:
+- **Contribution Stats**: Visual breakdown of problems, ideas, meetups, and chat participation
+- **Points Display**: Current total points with link to full leaderboard
+- **Recent Activity**: Timeline of recent contributions and engagements
+- **Achievement Badges**: Visual indicators for milestones and special contributions
+
+**Account Management Panel**:
+- **Authentication Status**: Shows current auth state (guest vs signed in)
+- **Upgrade Account**: CTA for guest users to create full account (links to Supabase Auth)
+- **Privacy Settings**: Basic controls for profile visibility and data sharing
+- **Notification Preferences**: Toggle settings for different types of notifications
+
+**Critical Actions Panel**:
+- **Logout Button**: Clear session and return to anonymous state
+- **Delete Account**: Permanent account removal with confirmation flow
+- **Export Data**: Download personal data and contributions (future GDPR compliance)
+- **Help & Support**: Links to documentation and contact options
+
+**Design Specifications**:
+- **Layout**: Vertical stack of rounded panels with consistent p-3 padding
+- **Icons**: User, Camera, Settings, LogOut, Trash2, Download, HelpCircle from Lucide React
+- **Color Coding**: Orange accents for primary actions, red for destructive actions
+- **Image Upload**: Modal with camera/gallery options, cropping, and compression
+- **Form Validation**: Real-time validation for name, bio length, and location format
+- **Responsive Behavior**: Single column on mobile, optional two-column layout on larger screens
+
+**Integration Points**:
+- **Guest to User Migration**: Seamless upgrade path preserving all contributions
+- **Profile Image Storage**: Supabase Storage with automatic resizing and optimization
+- **Data Synchronization**: Real-time updates across all user contributions
+- **Privacy Controls**: Granular settings for profile and activity visibility
+
+---
+
+## Universal Header System
+
+The app uses a standardized `SharedHeader` component across all pages to ensure consistent navigation and spacing:
+
+### Header Modes
+- **`tabs` mode**: Used on main pages (Problems/Meetups) with compass and calendar icons
+- **`back` mode**: Used on detail pages with a back button for hierarchical navigation
+
+### Implementation Details
+- **Consistent Styling**: All headers use standardized padding (`px-3 pt-8 pb-2`)
+- **Fixed Positioning**: Headers are fixed at the top with `z-50` layering
+- **Client Component**: Marked with `"use client"` directive for `useRouter` support
+- **Flexible Navigation**: Supports custom `backHref` and `onBackClick` handlers
+- **Responsive Design**: Maintains centered logo with appropriate side actions
+
+### Usage Patterns
+```tsx
+// Main navigation pages
+<SharedHeader activeTab="problems" />
+<SharedHeader activeTab="meetups" />
+
+// Detail pages with back navigation
+<SharedHeader mode="back" backHref={`/problems/${problemId}`} />
+<SharedHeader mode="back" backHref="/" />
+```
+
+### Content Spacing
+Pages using `SharedHeader` should apply `pt-20 pb-2` to content containers to account for the fixed header positioning and maintain proper visual hierarchy.
 
 ---
 
@@ -167,19 +280,33 @@ Recommended navigation: bottom primary actions (Add, Meetups, Discover) on mobil
 
 ### Core Components
 - **LogoSymbol**: Consistent app branding with scalable SVG icon
+- **SharedHeader**: Universal header component with two modes:
+  - `tabs` mode: Shows compass/calendar icons for main navigation (problems/meetups)
+  - `back` mode: Shows back button for detail pages with optional custom navigation
+  - Supports standardized padding (`px-3 pt-8 pb-2`) and consistent styling
+  - Client component with `useRouter` support for navigation
 - **ProblemPillNav**: Tabbed navigation for problem detail views
 - **MeetupCard**: Card component for meetup listings with status indicators
 - **IdeaCard**: Card component for idea listings with voting metrics
 - **ImageZoomModal**: Full-featured modal for image zoom and pan functionality
-- **Panel System**: Consistent rounded panels with icon headers and padding
+- **Panel System**: Consistent rounded panels with icon headers and padding (p-3)
 
 ### Design Principles
 - **Mobile-First**: All components optimized for touch interaction
 - **Flexible Layouts**: No width restrictions, works seamlessly on desktop
-- **Consistent Spacing**: Universal panel padding (p-6) and standardized gaps
+- **Consistent Spacing**: Compact panel padding (p-3) and standardized gaps
 - **Visual Hierarchy**: Icon headers, proper typography scale, and color contrast
 - **Interactive Feedback**: Hover states, focus rings, and loading states
 - **Accessibility**: ARIA labels, keyboard navigation, and screen reader support
+
+### Spacing System (standardized)
+- **Header container**: `px-3 pt-8 pb-2` (universally applied via `SharedHeader`)
+- **Navigation spacing**: `pt-20 pb-2` for content below `SharedHeader` to account for fixed positioning
+- **Main container**: `px-3` with page-specific bottom padding (e.g., `pb-12`, `pb-16`, `pb-3`)
+- **Panels**: `p-3` with rounded corners (`rounded-[30px]`)
+- **Grids**: `gap-4` on mobile and `lg:gap-4`
+- **Vertical lists**: `space-y-4`
+- **Sticky CTAs**: wrapper `px-3 pb-4`
 
 ### Interactive Features
 - **Touch Gestures**: Swipe scrolling, pinch-to-zoom, drag-to-pan
@@ -370,6 +497,7 @@ Each feature owns UI, validation (Zod), and data adapters. Cross-feature contrac
 
 ## Animations & Motion System
 
+### Core Animation Principles
 - Centralize motion tokens and presets in a single module (e.g., `src/lib/motion.ts`).
 - Store shared timings and easings:
   - `duration.fast = 0.2s`, `duration.base = 0.3s`, `duration.slow = 0.5s`.
@@ -379,6 +507,84 @@ Each feature owns UI, validation (Zod), and data adapters. Cross-feature contrac
   - `fadeInUp` (opacity + translateY, 0.3s, inOut)
   - `scaleIn` (scale 0.98 → 1, 0.2s, out)
 - Prefer CSS-first transitions for simple effects; use a motion lib (e.g., Framer Motion) for complex orchestrations.
+
+### Intersection Observer Animation System
+
+**Implementation Pattern**: Used consistently across list/grid pages (meetups, problem details) for smooth content reveal animations.
+
+```tsx
+// State Management
+const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+const observerRef = useRef<IntersectionObserver | null>(null);
+
+// Intersection Observer Setup
+useEffect(() => {
+  observerRef.current = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const cardId = entry.target.getAttribute('data-card-id');
+          if (cardId) {
+            setVisibleCards(prev => new Set([...prev, cardId]));
+          }
+        }
+      });
+    },
+    {
+      threshold: 0.1,        // Trigger when 10% visible
+      rootMargin: '50px'     // Start animation 50px before entering viewport
+    }
+  );
+
+  // Show initially visible elements after DOM ready
+  const timeout = setTimeout(() => {
+    const initiallyVisible = new Set(['item1', 'item2', 'item3']);
+    setVisibleCards(initiallyVisible);
+  }, 100);
+
+  return () => {
+    clearTimeout(timeout);
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+  };
+}, []);
+
+// Ref Callback for Elements
+const cardRef = (element: HTMLElement | null, cardId: string) => {
+  if (element && observerRef.current) {
+    element.setAttribute('data-card-id', cardId);
+    observerRef.current.observe(element);
+  }
+};
+```
+
+**Animation Classes & Timing**:
+```tsx
+// Element Implementation
+<div
+  ref={(el) => cardRef(el, 'unique-id')}
+  className={`transform transition-all duration-700 ease-out ${
+    visibleCards.has('unique-id') 
+      ? 'opacity-100 translate-y-0' 
+      : 'opacity-0 translate-y-8'
+  }`}
+  style={{ transitionDelay: `${index * 100}ms` }}
+>
+```
+
+**Standard Animation Timings**:
+- **Cards/Panels**: 700ms duration with `ease-out`
+- **Headers**: 500ms duration with `ease-out`
+- **Stagger Delay**: 100ms between cards, 50ms between headers
+- **Y-Transform**: 8px (translate-y-8) for cards, 4px for headers
+- **Threshold**: 10% visibility with 50px margin for early trigger
+
+**Usage Guidelines**:
+- Apply to any scrollable content lists (meetups, problems, ideas)
+- Use consistent delay patterns for visual hierarchy
+- Always include initial visibility timeout for above-fold content
+- Ensure proper cleanup of observers and timeouts
 
 ---
 

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Plus, Upload, Scan, X, ArrowRight, RefreshCw, ChevronLeft, Trash2, ScanEye } from "lucide-react";
 import LogoSymbol from "@/components/Logo";
 
@@ -68,7 +69,7 @@ export default function AddProblemCapture({
         await videoEl.play();
       }
       setStep("camera");
-    } catch (err) {
+          } catch (error) {
       setErrorMessage("Camera access denied or unavailable.");
       setIsOpen(true); // keep overlay open so user can upload
     } finally {
@@ -251,7 +252,7 @@ export default function AddProblemCapture({
             {step === "camera" ? (
               <video ref={videoRef} playsInline muted className="h-full w-full object-cover" />
             ) : step === "preview" && previewUrl ? (
-              <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
+              <Image src={previewUrl} alt="Preview" fill className="object-cover" sizes="100vw" />
             ) : (
               <div className="h-full w-full bg-[#141414]" />
             )}
@@ -372,7 +373,7 @@ export default function AddProblemCapture({
                   <div className="flex items-center gap-3 overflow-x-auto">
                     {selectedMediaUrls.map((url, idx) => (
                       <div key={url + idx} className="relative h-[121px] w-[93px] flex-shrink-0 overflow-hidden rounded-[16px] bg-[#D9D9D9]">
-                        <img src={url} alt={`media-${idx}`} className="h-full w-full object-cover" />
+                        <Image src={url} alt={`media-${idx}`} fill className="object-cover" sizes="93px" />
                         <button
                           type="button"
                           onClick={() => removeMediaAt(idx)}
@@ -483,10 +484,12 @@ export default function AddProblemCapture({
                   <div className="absolute -inset-4 rounded-full border-[15px] border-[#FF2F00] opacity-80 blur-[50px]" />
                   <div className="absolute -inset-2 rounded-full border-[8px] border-[#FF8400] opacity-90 blur-[20px]" />
                   <div className="relative h-full w-full overflow-hidden rounded-full bg-[#D9D9D9]">
-                    <img
+                    <Image
                       src={previewUrl || selectedMediaUrls[0]}
                       alt="preview"
-                      className="h-full w-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="200px"
                     />
                   </div>
                 </div>

@@ -42,7 +42,7 @@ export default function IdeaCard({
 		return (
 			<div className="relative">
 				<article
-					onClick={(e) => {
+					onClick={() => {
 						if (!href) return;
 						// clicking the article navigates; inner buttons stopPropagation
 						router.push(href);

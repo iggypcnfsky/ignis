@@ -1,20 +1,22 @@
+"use client";
+
 import Link from "next/link";
-import { ChevronLeft, Plus } from "lucide-react";
-import LogoSymbol from "@/components/Logo";
+import { Plus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "next/navigation";
 import ProblemPillNav from "@/components/ProblemPillNav";
+import SharedHeader from "@/components/SharedHeader";
 import MeetupCard from "@/components/MeetupCard";
 import { getMeetupsForProblem } from "@/lib/demoMeetups";
-import { demoProblems } from "@/lib/demoProblems";
 
-type MeetupsPageProps = {
-  params: Promise<{
-    problemId: string;
-  }>;
-};
 
-export default async function MeetupsPage({ params }: MeetupsPageProps) {
-  const { problemId } = await params;
+export default function MeetupsPage() {
+  const params = useParams<{ problemId: string }>();
+  const problemId = Array.isArray(params?.problemId) ? params?.problemId[0] : params?.problemId;
   const meetups = getMeetupsForProblem(problemId);
+
+  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   // Group meetups by date
   const meetupsByDate = meetups.reduce((acc, meetup) => {
@@ -26,70 +28,123 @@ export default async function MeetupsPage({ params }: MeetupsPageProps) {
   }, {} as Record<string, typeof meetups>);
 
   // Get current problem for context
-  const currentProblem = demoProblems.find(p => p.id === problemId);
+  // const currentProblem = demoProblems.find(p => p.id === problemId); // TODO: Use for problem-specific content
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const cardId = entry.target.getAttribute('data-card-id');
+            if (cardId) {
+              setVisibleCards(prev => new Set([...prev, cardId]));
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
+    );
+
+    // Show initially visible cards after a short delay
+    const timeout = setTimeout(() => {
+      const initiallyVisible = new Set<string>();
+      
+      // Check which cards are initially in view
+      Object.entries(meetupsByDate).forEach(([date, dateMeetups]) => {
+        initiallyVisible.add(`header-${date}`);
+        dateMeetups.forEach((meetup) => {
+          initiallyVisible.add(`${date}-${meetup.id}`);
+        });
+      });
+      
+      setVisibleCards(initiallyVisible);
+    }, 100);
+
+    return () => {
+      clearTimeout(timeout);
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [meetupsByDate]);
+
+  const cardRef = (element: HTMLDivElement | null, cardId: string) => {
+    if (element && observerRef.current) {
+      element.setAttribute('data-card-id', cardId);
+      observerRef.current.observe(element);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#141414] text-white">
-      {/* Header */}
-      <div className="relative">
-        {/* Background glow removed */}
-
-        {/* Logo and Navigation */}
-        <div className="relative z-10 px-6 pt-16 pb-4">
-          <div className="flex items-center justify-between mb-8">
-            {/* Back button */}
-            <Link
-              href={`/problems/${problemId}`}
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-[rgba(36,36,36,0.3)] backdrop-blur-[100px]"
-            >
-              <ChevronLeft className="w-6 h-6 text-white" />
-            </Link>
-
-            {/* Centered Logo */}
-            <div className="absolute left-1/2 transform -translate-x-1/2">
-              <Link
-              href="/"
-              aria-label="Go to explore page"
-              className="flex items-center justify-center"
-            >
-              <LogoSymbol size={24} className="text-white" />
-            </Link>
-            </div>
-
-            {/* Spacer for centering */}
-            <div className="w-10 h-10" />
-          </div>
-
-          {/* Pill Navigation */}
-          <ProblemPillNav problemId={problemId} active="meet" />
-        </div>
+      {/* Shared Header */}
+      <SharedHeader mode="back" backHref={`/problems/${problemId}`} />
+      
+      {/* Navigation */}
+      <div className="relative z-10 px-3 pt-20 pb-2">
+        <ProblemPillNav problemId={problemId} active="meet" />
       </div>
 
       {/* Content */}
-      <div className="px-6 pb-32">
+      <div className="px-3 pb-16">
 
 
         {/* Meetups by Date */}
         <div className="space-y-8">
-          {Object.entries(meetupsByDate).map(([date, dateMeetups]) => (
+          {Object.entries(meetupsByDate).map(([date, dateMeetups], sectionIndex) => {
+            const headerCardId = `header-${date}`;
+            const isHeaderVisible = visibleCards.has(headerCardId);
+            return (
             <div key={date} className="space-y-4">
               {/* Date Header */}
-              <h2 className="text-[14px] leading-[1.17] font-display text-[#9A9A9A]">
-                {date}
-              </h2>
+              <div
+                ref={(el) => cardRef(el, headerCardId)}
+                className={`transform transition-all duration-500 ease-out ${
+                  isHeaderVisible 
+                    ? 'opacity-100 translate-y-0' 
+                    : 'opacity-0 translate-y-4'
+                }`}
+                style={{
+                  transitionDelay: `${sectionIndex * 50}ms`
+                }}
+              >
+                <h2 className="text-[14px] leading-[1.17] font-display text-[#9A9A9A]">
+                  {date}
+                </h2>
+              </div>
 
               {/* Meetup Cards */}
               <div className="space-y-4">
-                {dateMeetups.map((meetup) => (
-                  <MeetupCard
-                    key={meetup.id}
-                    meetup={meetup}
-                    className="w-full"
-                  />
-                ))}
+                {dateMeetups.map((meetup, index) => {
+                  const cardId = `${date}-${meetup.id}`;
+                  const isVisible = visibleCards.has(cardId);
+                  return (
+                    <div
+                      key={meetup.id}
+                      ref={(el) => cardRef(el, cardId)}
+                      className={`transform transition-all duration-700 ease-out ${
+                        isVisible 
+                          ? 'opacity-100 translate-y-0' 
+                          : 'opacity-0 translate-y-8'
+                      }`}
+                      style={{
+                        transitionDelay: `${index * 100}ms`
+                      }}
+                    >
+                      <MeetupCard
+                        meetup={meetup}
+                        className="w-full"
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Empty State */}
@@ -106,7 +161,7 @@ export default async function MeetupsPage({ params }: MeetupsPageProps) {
       </div>
 
       {/* Sticky CTA Button */}
-      <div className="fixed bottom-0 left-0 right-0 px-6 pb-8">
+      <div className="fixed bottom-0 left-0 right-0 px-3 pb-4">
         <Link
           href={`/problems/${problemId}/meetups/add`}
           className="w-full h-12 border-4 border-[#FF8400] bg-[#212121] rounded-[100px] flex items-center justify-center gap-2 shadow-lg"

@@ -2,22 +2,62 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useParams } from "next/navigation";
-import { useState } from "react";
-import { ChevronLeft, Calendar, ZoomIn, FileText, BarChart3, MapPin, Grid3X3 } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { Calendar, ZoomIn, FileText, BarChart3, MapPin, Grid3X3 } from "lucide-react";
 import ProblemPillNav from "@/components/ProblemPillNav";
-import LogoSymbol from "@/components/Logo";
+import SharedHeader from "@/components/SharedHeader";
 import ImageZoomModal from "@/components/ImageZoomModal";
 import { demoProblems } from "@/lib/demoProblems";
 
 export default function ProblemDetails() {
-  const router = useRouter();
   const params = useParams<{ problemId: string }>();
   const problemId = Array.isArray(params?.problemId) ? params?.problemId[0] : params?.problemId;
   const problem = demoProblems.find((p) => p.id === problemId) ?? demoProblems[0];
   const similarProblems = demoProblems.filter((p) => p.id !== problem.id).slice(0, 3);
 
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [visiblePanels, setVisiblePanels] = useState<Set<string>>(new Set());
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const panelId = entry.target.getAttribute('data-panel-id');
+            if (panelId) {
+              setVisiblePanels(prev => new Set([...prev, panelId]));
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
+    );
+
+    // Show initially visible panels after a short delay
+    const timeout = setTimeout(() => {
+      const initiallyVisible = new Set(['title', 'hero', 'location', 'description', 'poll', 'similar']);
+      setVisiblePanels(initiallyVisible);
+    }, 100);
+
+    return () => {
+      clearTimeout(timeout);
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []);
+
+  const panelRef = (element: HTMLElement | null, panelId: string) => {
+    if (element && observerRef.current) {
+      element.setAttribute('data-panel-id', panelId);
+      observerRef.current.observe(element);
+    }
+  };
 
   return (
     <div className="relative min-h-dvh w-full bg-[#141414] text-white">
@@ -26,39 +66,45 @@ export default function ProblemDetails() {
           display: none;
         }
       `}</style>
-      {/* Header with centered logo and back button */}
-      <div className="relative z-10 px-6 pt-16 pb-4">
-        <div className="flex items-center justify-between mb-8">
-          <button
-            type="button"
-            onClick={() => router.push("/")}
-            aria-label="Back to Discover"
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-[rgba(36,36,36,0.3)] backdrop-blur-[100px]"
-          >
-            <ChevronLeft size={20} className="text-white" strokeWidth={1.7} />
-          </button>
-          <div className="absolute left-1/2 transform -translate-x-1/2">
-            <Link
-              href="/"
-              aria-label="Go to explore page"
-              className="flex items-center justify-center"
-            >
-              <LogoSymbol size={24} className="text-white" />
-            </Link>
-          </div>
-          <div className="w-10 h-10" />
-        </div>
+      {/* Shared Header */}
+      <SharedHeader mode="back" backHref="/" />
+      
+      {/* Navigation */}
+      <div className="relative z-10 px-3 pt-20 pb-2">
         <ProblemPillNav problemId={problem.id} active="problem" />
       </div>
 
       {/* Content */}
-      <main className="px-6 pb-6 problem-detail-page">
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6">
+      <main className="px-3 pb-3 problem-detail-page">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:gap-3">
+          {/* Title Panel */}
+          <div 
+            ref={(el) => panelRef(el, 'title')}
+            className={`rounded-[30px] bg-[#212121] p-4 lg:col-span-12 transform transition-all duration-700 ease-out ${
+              visiblePanels.has('title') 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 translate-y-8'
+            }`}
+            style={{ transitionDelay: '0ms' }}
+          >
+            <h1 className="font-display text-[24px] leading-tight text-white">
+              {problem.title}
+            </h1>
+          </div>
+
           {/* Hero card */}
-          <div className="rounded-[30px] bg-transparent lg:col-span-12 overflow-hidden">
+          <div 
+            ref={(el) => panelRef(el, 'hero')}
+            className={`rounded-[30px] bg-transparent lg:col-span-12 overflow-hidden transform transition-all duration-700 ease-out ${
+              visiblePanels.has('hero') 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 translate-y-8'
+            }`}
+            style={{ transitionDelay: '100ms' }}
+          >
             <button
               onClick={() => setIsImageModalOpen(true)}
-              className="relative aspect-[16/10.8] w-full overflow-hidden cursor-pointer hover:opacity-90 transition-opacity focus:outline-none focus:ring-0 border-0 outline-none"
+              className="relative aspect-[16/12] w-full overflow-hidden cursor-pointer hover:opacity-90 transition-opacity focus:outline-none focus:ring-0 border-0 outline-none"
               aria-label={`Zoom into ${problem.title} image`}
               style={{ border: 'none' }}
             >
@@ -88,7 +134,15 @@ export default function ProblemDetails() {
           </div>
 
           {/* Location/Map */}
-          <section className="rounded-[30px] bg-[#212121] p-6 lg:col-span-7">
+          <section 
+            ref={(el) => panelRef(el, 'location')}
+            className={`rounded-[30px] bg-[#212121] p-4 lg:col-span-7 transform transition-all duration-700 ease-out ${
+              visiblePanels.has('location') 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 translate-y-8'
+            }`}
+            style={{ transitionDelay: '200ms' }}
+          >
             <div className="flex items-center gap-2">
               <MapPin size={18} className="text-white/60" />
               <span className="font-display text-[16px] leading-5">Location</span>
@@ -107,7 +161,15 @@ export default function ProblemDetails() {
           </section>
 
           {/* Description card */}
-          <section className="rounded-[30px] bg-[#212121] p-6 lg:col-span-5">
+          <section 
+            ref={(el) => panelRef(el, 'description')}
+            className={`rounded-[30px] bg-[#212121] p-4 lg:col-span-5 transform transition-all duration-700 ease-out ${
+              visiblePanels.has('description') 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 translate-y-8'
+            }`}
+            style={{ transitionDelay: '300ms' }}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileText size={18} className="text-white/60" />
@@ -136,7 +198,15 @@ export default function ProblemDetails() {
           </section>
 
           {/* Poll */}
-          <section className="rounded-[30px] bg-[#212121] p-6 lg:col-span-5">
+          <section 
+            ref={(el) => panelRef(el, 'poll')}
+            className={`rounded-[30px] bg-[#212121] p-4 lg:col-span-5 transform transition-all duration-700 ease-out ${
+              visiblePanels.has('poll') 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 translate-y-8'
+            }`}
+            style={{ transitionDelay: '400ms' }}
+          >
             <div className="flex items-center gap-2">
               <BarChart3 size={18} className="text-white/60" />
               <span className="font-display text-[16px] leading-5">Poll</span>
@@ -167,7 +237,15 @@ export default function ProblemDetails() {
           </section>
 
           {/* Similar problems */}
-          <section className="rounded-[30px] bg-[#212121] p-6 lg:col-span-12 overflow-hidden">
+          <section 
+            ref={(el) => panelRef(el, 'similar')}
+            className={`rounded-[30px] bg-[#212121] p-4 lg:col-span-12 overflow-hidden transform transition-all duration-700 ease-out ${
+              visiblePanels.has('similar') 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 translate-y-8'
+            }`}
+            style={{ transitionDelay: '500ms' }}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Grid3X3 size={18} className="text-white/60" />

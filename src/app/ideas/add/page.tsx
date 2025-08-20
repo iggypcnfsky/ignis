@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useRef, useCallback, useEffect, Suspense } from "react";
 import LogoSymbol from "@/components/Logo";
 import { ChevronLeft, ArrowRight, ScanEye, Upload, Trash2 } from "lucide-react";
@@ -25,7 +26,7 @@ function AddIdeaPageInner() {
 		if (files.length === 0) return;
 		const newUrls = files.map((f) => URL.createObjectURL(f));
 		setSelectedMediaUrls((prev) => [...prev, ...newUrls]);
-		// eslint-disable-next-line no-console
+	
 		console.log("[add-media-placeholder] added:", newUrls);
 	}, []);
 
@@ -123,7 +124,7 @@ function AddIdeaPageInner() {
 						<div className="flex items-center gap-3 overflow-x-auto">
 							{selectedMediaUrls.map((url, idx) => (
 								<div key={url + idx} className="relative h-[121px] w-[93px] flex-shrink-0 overflow-hidden rounded-[16px] bg-[#D9D9D9]">
-									<img src={url} alt={`media-${idx}`} className="h-full w-full object-cover" />
+									<Image src={url} alt={`media-${idx}`} fill className="object-cover" sizes="93px" />
 									<button
 										type="button"
 										onClick={() => removeMediaAt(idx)}

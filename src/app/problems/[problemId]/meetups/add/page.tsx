@@ -1,12 +1,12 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState, useCallback, useEffect } from "react";
-import LogoSymbol from "@/components/Logo";
-import { ChevronLeft, ArrowRight, Calendar, Clock, Users, MapPin, MessageCircle, X } from "lucide-react";
+import { useState, useCallback } from "react";
+import { ChevronLeft, ArrowRight, Calendar, Clock, MapPin, MessageCircle, X } from "lucide-react";
 import Link from "next/link";
+import LogoSymbol from "@/components/Logo";
 import { demoProblems } from "@/lib/demoProblems";
-import { demoIdeas, type Idea } from "@/lib/demoIdeas";
+import { demoIdeas } from "@/lib/demoIdeas";
 
 type Step = "description" | "ideas" | "datetime" | "review" | "congrats";
 
