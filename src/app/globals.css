@@ -55,3 +55,92 @@ html, body {
   border: 2px solid transparent;
   background-clip: content-box;
 }
+
+/* Animation keyframes for home page */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutFast {
+  from {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+}
+
+/* Enhanced scroll snap for magnetic behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure main scroll container has proper snap behavior */
+main, #problems-scroll-container {
+  scroll-snap-type: y mandatory !important;
+  scroll-padding: 0 !important;
+  scroll-behavior: smooth !important;
+}
+
+/* Force instant scroll behavior */
+main * {
+  scroll-behavior: auto !important;
+}
+
+/* Magnetic snap behavior */
+main, #problems-scroll-container {
+  scroll-snap-type: y mandatory !important;
+  scroll-snap-stop: always !important;
+  scroll-behavior: auto !important;
+}
+
+main > *, #problems-scroll-container > * {
+  scroll-snap-align: start !important;
+  scroll-snap-stop: always !important;
+  min-height: 100vh !important;
+  scroll-margin: 0 !important;
+}
+
+/* Force hardware acceleration for smoother scrolling */
+main > *, #problems-scroll-container > * {
+  will-change: scroll-position;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Ensure no gaps between slides */
+main, #problems-scroll-container {
+  gap: 0 !important;
+}
+
+main > *, #problems-scroll-container > * {
+  margin: 0 !important;
+  gap: 0 !important;
+}
+
+/* Prevent momentum scrolling on iOS */
+@media screen and (max-width: 768px) {
+  main {
+    -webkit-overflow-scrolling: auto;
+  }
+}
+
+/* Force instant snap behavior on all browsers */
+* {
+  -ms-scroll-snap-type: y mandatory;
+  -ms-scroll-snap-stop: always;
+}

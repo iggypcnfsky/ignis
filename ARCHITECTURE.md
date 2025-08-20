@@ -54,6 +54,18 @@ This document captures the current architecture for the Ignis platform and evolv
   - Avoid importing remote Google CSS; always use `next/font` for self-hosting and better CLS.
   - Prefer using the variable form (`var(--font-...)`) for consistent overrides; where necessary, you can use the `className` provided by `next/font` to force application.
 - **i18n**: Internationalization via `next-i18next` (powered by `i18next`) with JSON locale files per language and feature.
+
+### Enhanced Icon System
+- **Lucide React Icons**: Primary icon library for consistent, lightweight icons across the app
+- **Panel Header Icons**: Each content panel includes relevant icons for better visual hierarchy:
+  - Report panels: `FileText` for documentation/content
+  - Poll panels: `BarChart3` for data visualization
+  - Location/Map panels: `MapPin` for geographical content
+  - Similar content panels: `Grid3X3` for collections
+  - Interactive elements: `ZoomIn`, `Plus`, `Minus`, `RotateCcw` for zoom controls
+  - Time elements: `Calendar` for date/timestamp displays
+- **Icon Sizing**: Consistent 18px size for panel headers, contextual sizing for other uses
+- **Accessibility**: All icons include proper ARIA labels and semantic meaning
 - **Routing**: Feature-oriented routes under `src/app` with nested layouts for Problems, Ideas, Meetups, and Chat.
 - **Data fetching**: Server Components or Route Handlers for secure operations; client components subscribe to Realtime.
 - **State**:
@@ -62,6 +74,11 @@ This document captures the current architecture for the Ignis platform and evolv
   - Avoid global stores for server-derived data; subscribe directly to Supabase or fetch via RSC.
 - **Media capture**: Use `getUserMedia` and `<input type="file" accept="image/*;capture=camera">` fallbacks. Compress client-side as needed.
 - **Sharing**: Web Share API when available; canonical deep links for copy/share.
+- **Image Interaction**: Hero images support click-to-zoom with full pan and zoom controls
+- **Responsive Design**: All layouts are fully flexible for desktop use with no width restrictions
+- **Panel System**: Content organized in rounded panels with consistent padding (p-6) and icon headers
+- **Horizontal Sliders**: Similar content displayed in touch-friendly horizontal sliders with scroll snap
+- **Visual Feedback**: Interactive elements include hover states, focus rings, and loading states
 
 ---
 
@@ -77,15 +94,31 @@ Route suggestions assume Next.js App Router under `src/app`.
 - **Add Problem Flow** (`/problems/add`)
   - Step 1: camera/upload → Step 2: describe → Step 3: congrats → navigate to created problem.
 - **Detailed Problem** (`/problems/[problemId]`)
-  - Media carousel, description, map/location, poll results, related problems, actions (Share, Add Idea, See Meetups, Chat).
+  - Interactive hero image with zoom/pan modal
+  - Comprehensive report panel with calendar icon and timestamp
+  - Visualized poll with dynamic vote proportion bars
+  - Location panel with Google Maps placeholder
+  - Horizontal slider for similar problems with square cards (160×160px)
+  - All panels include relevant Lucide React icons
+  - Universal panel padding (p-6) for better breathing room
+  - Actions (Share, Add Idea, See Meetups, Chat).
 - **Ideas for Problem** (`/problems/[problemId]/ideas`)
-  - Card list of ideas with votes; sort by top/new; link to idea details.
+  - Horizontal slider with idea cards featuring votes and visual metrics
+  - Square card design (160×160px) with hover scale animations
+  - Scroll snap for smooth navigation
+  - "Got a better idea?" CTA with navigation to add flow.
 - **Detailed Idea** (`/problems/[problemId]/ideas/[ideaId]`)
-  - Description, media/visuals, step-by-step plan, cost/resources, author, linked problems, upcoming meetups; CTA to organize meetup.
-- **Add Idea Flow** (`/problems/[problemId]/ideas/add?problemId=...`)
-  - Wizard: (1) idea summary → (2) visuals → (3) plan steps → (4) resources & cost → (5) author details → (6) congrats → idea view.
+  - Description, user-uploaded media/visuals, step-by-step plan, cost/resources, author, linked problems, upcoming meetups; CTA to organize meetup.
+- **Add Idea Flow** (`/ideas/add?problemId=...` or `/problems/[problemId]/ideas/add`)
+  - Simplified single-screen flow: (1) idea description with media upload → (2) share → (3) congrats → ideas list.
+  - Media upload: Multiple images/videos with thumbnail preview, remove functionality, and drag-and-drop support.
+  - Mobile-first design with horizontal scroll for multiple media items.
 - **Problem Meetups** (`/problems/[problemId]/meetups`)
-  - Upcoming meetups tied to the problem; CTA to create meetup.
+  - Clean, flexible layout with centered LogoSymbol
+  - Meetup cards with status indicators (Live/Online)
+  - Cards show participants, problems, ideas, and duration
+  - Sticky CTA button for adding new meetups
+  - Removed orange gradients for cleaner appearance.
 - **Detailed Meetup** (`/problems/[problemId]/meetups/[meetupId]`)
   - Agenda, linked idea(s) and optional problem, location/map, time, details, Join button.
 - **Add Meetup Flow** (`/problems/[problemId]/meetups/add`)
@@ -111,6 +144,48 @@ Recommended navigation: bottom primary actions (Add, Meetups, Discover) on mobil
 - **Report/Flag Content** (modal/route): abuse reporting per entity.
 - **Settings** (`/settings`): notifications, language, privacy; minimal at MVP.
 - **About/Terms/Privacy** (`/about`, `/terms`, `/privacy`): static pages for open-source and compliance.
+
+### Enhanced Problem Detail Page Features
+
+- **Interactive Hero Image**: Clickable image with zoom and pan functionality via modal
+- **Visualized Poll System**: Dynamic vote bars showing proportions with percentage indicators
+- **Comprehensive Panel Icons**: Each panel header includes relevant Lucide React icons:
+  - Report: FileText icon
+  - Poll: BarChart3 icon
+  - Location: MapPin icon
+  - Similar Problems: Grid3X3 icon
+- **Enhanced Date Display**: Report dates include calendar icon with full timestamp
+- **Google Maps Integration Panel**: Dedicated location panel with map placeholder
+- **Responsive Similar Problems Slider**: Horizontal scroll with square cards (160×160px) and overflow clipped at panel level
+- **Universal Panel Padding**: Increased padding (p-6) for better breathing room
+- **Clean Visual Hierarchy**: Removed distracting orange gradients and borders
+- **Mobile-Optimized Zoom Indicator**: Always-visible zoom icon for touch devices
+
+---
+
+## Component Library & Design System
+
+### Core Components
+- **LogoSymbol**: Consistent app branding with scalable SVG icon
+- **ProblemPillNav**: Tabbed navigation for problem detail views
+- **MeetupCard**: Card component for meetup listings with status indicators
+- **IdeaCard**: Card component for idea listings with voting metrics
+- **ImageZoomModal**: Full-featured modal for image zoom and pan functionality
+- **Panel System**: Consistent rounded panels with icon headers and padding
+
+### Design Principles
+- **Mobile-First**: All components optimized for touch interaction
+- **Flexible Layouts**: No width restrictions, works seamlessly on desktop
+- **Consistent Spacing**: Universal panel padding (p-6) and standardized gaps
+- **Visual Hierarchy**: Icon headers, proper typography scale, and color contrast
+- **Interactive Feedback**: Hover states, focus rings, and loading states
+- **Accessibility**: ARIA labels, keyboard navigation, and screen reader support
+
+### Interactive Features
+- **Touch Gestures**: Swipe scrolling, pinch-to-zoom, drag-to-pan
+- **Scroll Snap**: Smooth card navigation with snap-to-center behavior
+- **Modal System**: Overlay modals with proper backdrop and focus management
+- **Animation System**: Subtle transitions and hover effects for better UX
 
 ---
 
@@ -401,6 +476,62 @@ This component is intentionally client-only and isolated so we can later swap th
 - **Future integration**:
   - Replace hardcoded ideas with real data (e.g., `ideas` table filtered by `problem_id`).
   - Persist upvotes server-side with abuse controls; store per-profile vote state and expose an aggregate count.
+
+## Add Idea Flow
+
+- **Route & File**: `src/app/ideas/add/page.tsx` (primary) or `src/app/problems/[problemId]/ideas/add/page.tsx` (alternative)
+- **Design reference**: Simplified version of Figma "Idea Flow - Step 1" ([Figma design](https://www.figma.com/design/gDQlVbqZDapQJquKbyzbJ9/Ignis?node-id=3-506&t=UsxHTuF3ry2yF5GL-4))
+- **States**: Two-step flow (`"idea"` → `"congrats"`)
+- **Features**:
+  - **Step 1**: "What's your idea?" screen with textarea and media upload
+  - **Media Upload**: Multiple images/videos with thumbnail preview (121px × 93px)
+  - **Remove Functionality**: Trash icon on each thumbnail to remove media
+  - **Add More Button**: Upload button with centered plus icon
+  - **Share Button**: Orange gradient CTA, disabled until idea text is entered
+  - **Step 2**: Congrats screen with lightbulb icon and "See your idea" button
+- **Technical Implementation**:
+  - File input with `accept="image/*,video/*"` and `multiple` attribute
+  - Object URL management with automatic cleanup on unmount
+  - State management: `selectedMediaUrls` array for uploaded files
+  - Consistent styling with `AddProblemCapture` component
+  - Mobile-first responsive design with horizontal scroll for media
+
+## Add Meetup Flow
+
+- **Route & File**: `src/app/problems/[problemId]/meetups/add/page.tsx`
+- **States**: Four-step flow (`"description"` → `"ideas"` → `"datetime"` → `"review"` → `"congrats"`)
+- **Features**:
+  - **Step 1 - Description**: Multi-line textarea for meetup description and purpose
+  - **Step 2 - Ideas Selection**: Optional panel to select related ideas to discuss
+    - Multiple selection support
+    - "Skip for now" option for optional selection
+    - Shows selected ideas count
+    - Displays idea titles and descriptions with vote counts
+  - **Step 3 - Date/Time & Location**: Comprehensive scheduling and location setup
+    - Default date: 1 week from today (auto-calculated)
+    - Default time: 5:00 PM (17:00)
+    - Location toggle: Offline/Online options
+    - Offline: Text input for physical location
+    - Online: URL input for meeting links (Google Meet, Zoom, etc.)
+    - Optional WhatsApp contact field
+  - **Step 4 - Review**: Complete information summary before creation
+    - Shows all entered data: description, selected ideas, date/time, location, WhatsApp
+    - Organized sections with orange headers
+    - Users can review and go back to edit any section
+  - **Step 5 - Congrats**: Success screen with calendar emoji and navigation to meetups list
+- **Navigation**:
+  - X icon in top-left corner to close/cancel the flow
+  - Back button on steps 2, 3, and 4 for navigation between views
+  - Continue button with contextual text ("Continue", "Review", "Create Meetup")
+  - Step indicators showing current progress (Step 1/2/3/4)
+- **Technical Implementation**:
+  - State management for all form fields: description, selectedIdeas, date, time, location, locationType, onlineLink, whatsappNumber
+  - Comprehensive validation with debug logging
+  - Conditional rendering based on location type (offline/online)
+  - Default values for better UX (date +1 week, time 5 PM)
+  - Console logging for form submission (placeholder for backend integration)
+  - Responsive design with consistent card styling
+  - Proper cleanup and memory management
 
 ## Detailed Idea View
 
