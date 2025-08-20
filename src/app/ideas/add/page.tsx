@@ -2,11 +2,11 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, Suspense } from "react";
 import LogoSymbol from "@/components/Logo";
 import { ChevronLeft, ArrowRight, ScanEye, Upload, Trash2 } from "lucide-react";
 
-export default function AddIdeaPage() {
+function AddIdeaPageInner() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const problemId = searchParams.get('problemId') || 'p1';
@@ -105,7 +105,7 @@ export default function AddIdeaPage() {
 						{/* Header */}
 						<div className="px-1">
 							<h1 className="font-display text-[30px] leading-none text-white">
-								What's your idea?
+								What&apos;s your idea?
 							</h1>
 						</div>
 
@@ -200,5 +200,13 @@ export default function AddIdeaPage() {
 				)}
 			</main>
 		</div>
+	);
+}
+
+export default function AddIdeaPage() {
+	return (
+		<Suspense fallback={null}>
+			<AddIdeaPageInner />
+		</Suspense>
 	);
 }
