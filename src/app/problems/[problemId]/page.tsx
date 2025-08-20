@@ -52,13 +52,13 @@ export default function ProblemDetails() {
       </div>
 
       {/* Content */}
-      <main className="px-6 pb-6">
+      <main className="px-6 pb-6 problem-detail-page">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-6">
           {/* Hero card */}
-          <div className="rounded-[30px] bg-[#212121] lg:col-span-7">
+          <div className="rounded-[30px] bg-transparent lg:col-span-12 overflow-hidden">
             <button
               onClick={() => setIsImageModalOpen(true)}
-              className="relative h-[320px] w-full overflow-hidden rounded-[30px] lg:h-[520px] cursor-pointer hover:opacity-90 transition-opacity focus:outline-none focus:ring-0 border-0 outline-none"
+              className="relative aspect-[16/10.8] w-full overflow-hidden cursor-pointer hover:opacity-90 transition-opacity focus:outline-none focus:ring-0 border-0 outline-none"
               aria-label={`Zoom into ${problem.title} image`}
               style={{ border: 'none' }}
             >
@@ -69,6 +69,7 @@ export default function ProblemDetails() {
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, (max-width: 1536px) 60vw, 800px"
                 priority
+                style={{ width: '100%', height: '100%' }}
               />
               {/* Zoom indicator - visible on mobile, hover on desktop */}
               <div className="absolute bottom-4 right-4">

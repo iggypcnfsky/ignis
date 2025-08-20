@@ -89,8 +89,8 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Ensure main scroll container has proper snap behavior */
-main, #problems-scroll-container {
+/* Ensure main scroll container has proper snap behavior (homepage only) */
+#problems-scroll-container {
   scroll-snap-type: y mandatory !important;
   scroll-padding: 0 !important;
   scroll-behavior: smooth !important;
@@ -101,14 +101,15 @@ main * {
   scroll-behavior: auto !important;
 }
 
-/* Magnetic snap behavior */
-main, #problems-scroll-container {
+/* Magnetic snap behavior (homepage only) */
+#problems-scroll-container {
   scroll-snap-type: y mandatory !important;
   scroll-snap-stop: always !important;
   scroll-behavior: auto !important;
 }
 
-main > *, #problems-scroll-container > * {
+/* Apply snap properties only to homepage slides */
+#problems-scroll-container > * {
   scroll-snap-align: start !important;
   scroll-snap-stop: always !important;
   min-height: 100vh !important;
@@ -122,14 +123,25 @@ main > *, #problems-scroll-container > * {
   backface-visibility: hidden;
 }
 
-/* Ensure no gaps between slides */
-main, #problems-scroll-container {
+/* Ensure no gaps between slides - only for home page */
+#problems-scroll-container {
   gap: 0 !important;
 }
 
-main > *, #problems-scroll-container > * {
+#problems-scroll-container > * {
   margin: 0 !important;
   gap: 0 !important;
+}
+
+/* Override for problem detail pages to allow proper gaps */
+main.problem-detail-page .grid {
+  gap: 1rem !important; /* 16px gap on mobile */
+}
+
+@media (min-width: 1024px) {
+  main.problem-detail-page .grid {
+    gap: 1.5rem !important; /* 24px gap on desktop */
+  }
 }
 
 /* Prevent momentum scrolling on iOS */
