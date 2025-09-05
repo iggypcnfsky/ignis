@@ -69,7 +69,7 @@ export default function AddProblemCapture({
         await videoEl.play();
       }
       setStep("camera");
-          } catch (error) {
+          } catch {
       setErrorMessage("Camera access denied or unavailable.");
       setIsOpen(true); // keep overlay open so user can upload
     } finally {

@@ -24,7 +24,6 @@ import {
   Users,
   Lightbulb,
   MessageCircle,
-  AlertTriangle,
   Crown
 } from "lucide-react";
 import SharedHeader from "@/components/SharedHeader";
