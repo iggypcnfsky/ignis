@@ -242,11 +242,12 @@ export default function ProblemDetails() {
             </div>
             <div className="mt-4">
               <div
-                className="flex gap-3 snap-x snap-mandatory pb-2 hide-scrollbar"
+                className="flex gap-3 snap-x snap-mandatory pb-2 hide-scrollbar overflow-x-auto"
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  WebkitOverflowScrolling: 'touch',
+                  touchAction: 'pan-x pinch-zoom'
                 }}
               >
                 {similarProblems.map((sp) => (

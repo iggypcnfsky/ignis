@@ -33,7 +33,7 @@ function ProblemSlide({ problem }: { problem: Problem }) {
         href={`/demo/${CONTEXT}/mobile/problems/${problem.id}`}
         aria-label={`Open details for ${problem.title}`}
         className="absolute inset-0 z-10"
-        style={{ touchAction: 'manipulation' }}
+        style={{ touchAction: 'pan-y' }}
       />
     </article>
   );
@@ -162,7 +162,7 @@ export default function CitiesDemo() {
         if (infoBar && questionText) {
           const targetScrollPosition = currentSlideIndex * slideHeight;
           const distanceFromTarget = Math.abs(scrollTop - targetScrollPosition);
-          const threshold = slideHeight * 0.1;
+          const threshold = slideHeight * 0.2; // Increased threshold for better responsiveness
 
           if (distanceFromTarget < threshold) {
             infoBar.style.opacity = '1';
@@ -174,7 +174,7 @@ export default function CitiesDemo() {
         }
 
         isScrolling = false;
-      }, 100);
+      }, 50); // Reduced timeout for faster response
     };
 
     const main = document.getElementById('problems-scroll-container') as HTMLElement;

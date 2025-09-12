@@ -96,6 +96,8 @@ body {
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: none !important;
   touch-action: pan-y !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 /* Apply snap properties only to homepage slides */
@@ -144,6 +146,47 @@ main.problem-detail-page .grid {
   }
   
   #problems-scroll-container > * {
+    touch-action: pan-y !important;
+  }
+
+  /* Ensure horizontal image galleries don't hijack vertical scroll */
+  .hide-scrollbar {
+    touch-action: pan-x pinch-zoom !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Prevent horizontal scroll from interfering with main vertical scroll */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Ensure main page scroll takes priority */
+  main.problem-detail-page {
+    touch-action: pan-y !important;
+    overflow-y: auto !important;
+  }
+
+  /* Fix for main demo pages - ensure scroll works properly */
+  #problems-scroll-container {
+    touch-action: pan-y !important;
+    overscroll-behavior-y: none !important;
+    scroll-snap-type: y mandatory !important;
+  }
+
+  /* Ensure clickable areas don't interfere with scroll */
+  #problems-scroll-container a {
+    touch-action: pan-y !important;
+    pointer-events: auto !important;
+  }
+
+  /* Force scroll behavior on mobile */
+  #problems-scroll-container > article {
+    touch-action: pan-y !important;
+    pointer-events: none !important;
+  }
+
+  #problems-scroll-container > article > a {
+    pointer-events: auto !important;
     touch-action: pan-y !important;
   }
 }
