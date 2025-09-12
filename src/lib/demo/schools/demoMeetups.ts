@@ -11,11 +11,9 @@ export type Meetup = {
   duration: string;
   problemIds: string[];
   ideaIds: string[];
-  // New fields that can be added in the wizard
   description?: string;
   location?: string;
   whatsapp?: string;
-  // New fields for Polish content and organizer
   organizer: string;
 };
 
@@ -99,6 +97,23 @@ export const demoMeetups: Meetup[] = [
     ideaIds: ["idea-19", "idea-20"],
     description: "Zbieramy podpisy do petycji o więcej autobusów. Planujemy też grupę rowerową do szkoły.",
     organizer: "Martyna Lewandowska",
+  },
+  {
+    id: "m6",
+    title: "Warsztaty przeciwko przemocy szkolnej",
+    date: "15 września",
+    time: "13:00", 
+    isLive: false,
+    isOnline: false,
+    participants: 35,
+    problemsCount: 1,
+    ideasCount: 3,
+    duration: "90min",
+    problemIds: ["p10"],
+    ideaIds: ["idea-21", "idea-24", "idea-25"],
+    description: "Warsztat z psychologiem szkolnym o przeciwdziałaniu przemocy. Dyskusja o bezpiecznych sposobach zgłaszania i programie mentoringowym.",
+    organizer: "Dr. Agnieszka Kowalczyk, psycholog szkolny",
+    location: "Aula szkolna",
   },
 ];
 

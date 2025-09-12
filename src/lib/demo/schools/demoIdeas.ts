@@ -180,4 +180,27 @@ export const demoIdeas: Idea[] = [
     description: "Zróbmy anonimową skrzynkę lub formularz online do zgłaszania przemocy. Czasem boję się zgłosić bo się nie chce wdawać w problemy, ale anonimowo byłoby łatwiej.",
     votesCount: 31,
   },
+
+  // Ideas for Violence in Corridors (p10)
+  {
+    id: "idea-21",
+    problemId: "p10",
+    title: "Warsztaty przeciwko przemocy",
+    description: "Zorganizujmy warsztaty dla wszystkich klas o tym jak radzić sobie z przemocą. Moja ciocia jest psychologiem i mogłaby pomóc. Ważne żeby wszyscy wiedzieli co robić gdy widzą przemoc.",
+    votesCount: 34,
+  },
+  {
+    id: "idea-24", 
+    problemId: "p10",
+    title: "System zgłaszania anonimowego",
+    description: "Potrzebujemy bezpiecznego sposobu zgłaszania przemocy. Może skrzynka anonimowa przy gabinecie psychologa? Albo formularz online? Niektórzy się boją zgłaszać bo myślą że będzie gorzej.",
+    votesCount: 28,
+  },
+  {
+    id: "idea-25",
+    problemId: "p10", 
+    title: "Program mentoringowy starsi-młodsi",
+    description: "Co jeśli każdy starszy uczeń zostanie mentorem młodszego? Zamiast dokuczać, mogliby pomagać. W mojej poprzedniej szkole to działało - tworzyło pozytywne relacje między klasami.",
+    votesCount: 19,
+  },
 ];

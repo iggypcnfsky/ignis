@@ -8,11 +8,15 @@ import { Calendar, ZoomIn, FileText, BarChart3, MapPin, Grid3X3 } from "lucide-r
 import ProblemPillNav from "@/components/ProblemPillNav";
 import SharedHeader from "@/components/SharedHeader";
 import ImageZoomModal from "@/components/ImageZoomModal";
-import { demoProblems } from "@/lib/demoProblems";
+import { getDemoProblems, type DemoContext } from "@/lib/demoContext";
 
-export default function ProblemDetails() {
+const CONTEXT: DemoContext = 'cities';
+
+export default function CitiesProblemDetails() {
   const params = useParams<{ problemId: string }>();
   const problemId = Array.isArray(params?.problemId) ? params?.problemId[0] : params?.problemId;
+  
+  const demoProblems = getDemoProblems(CONTEXT);
   const problem = demoProblems.find((p) => p.id === problemId) ?? demoProblems[0];
   const similarProblems = demoProblems.filter((p) => p.id !== problem.id).slice(0, 3);
 
@@ -67,11 +71,11 @@ export default function ProblemDetails() {
         }
       `}</style>
       {/* Shared Header */}
-      <SharedHeader mode="back" backHref="/" />
+      <SharedHeader mode="back" backHref="/demo/cities/mobile" />
       
       {/* Navigation */}
       <div className="relative z-10 px-3 pt-20 pb-2">
-        <ProblemPillNav problemId={problem.id} active="problem" />
+        <ProblemPillNav problemId={problem.id} active="problem" context="cities" />
       </div>
 
       {/* Content */}
@@ -140,7 +144,7 @@ export default function ProblemDetails() {
                     <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <p className="text-sm">Google Maps</p>
+                <p className="text-sm">City Map</p>
                 <p className="text-xs text-white/40 mt-1">Coming Soon</p>
               </div>
             </div>
@@ -159,21 +163,21 @@ export default function ProblemDetails() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileText size={18} className="text-white/60" />
-                <span className="font-display text-[16px] leading-5">Zgłoszenie</span>
+                <span className="font-display text-[16px] leading-5">Issue Report</span>
               </div>
             </div>
             <div className="mt-4 flex items-center gap-2 text-[12px] text-white/60">
               <Calendar size={12} className="text-white/40" />
               <span>
-                {new Date().toLocaleDateString('pl-PL', {
+                {new Date().toLocaleDateString('en-US', {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric'
-                })} o {new Date().toLocaleTimeString('pl-PL', {
+                })} at {new Date().toLocaleTimeString('en-US', {
                   hour: 'numeric',
                   minute: '2-digit',
-                  hour12: false
+                  hour12: true
                 })}
               </span>
             </div>
@@ -194,7 +198,7 @@ export default function ProblemDetails() {
           >
             <div className="flex items-center gap-2">
               <BarChart3 size={18} className="text-white/60" />
-              <span className="font-display text-[16px] leading-5">Ankieta</span>
+              <span className="font-display text-[16px] leading-5">Community Poll</span>
             </div>
             <h2 className="mt-3 text-[16px]">{problem.question}</h2>
             <div className="mt-3 space-y-2">
@@ -202,21 +206,21 @@ export default function ProblemDetails() {
                 <button
                   type="button"
                   className="h-10 rounded-full bg-[#FF8400] text-white flex items-center justify-center px-4 transition-all hover:bg-[#FF8400]/90"
-                  style={{ width: `${(12 / 18) * 100}%` }}
+                  style={{ width: `${(24 / 35) * 100}%` }}
                 >
-                  Tak (12)
+                  Yes (24)
                 </button>
-                <span className="text-xs text-white/60 ml-2">60%</span>
+                <span className="text-xs text-white/60 ml-2">69%</span>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   className="h-10 rounded-full bg-black text-white flex items-center justify-center px-4 transition-all hover:bg-black/90"
-                  style={{ width: `${(6 / 18) * 100}%` }}
+                  style={{ width: `${(11 / 35) * 100}%` }}
                 >
-                  Nie (6)
+                  No (11)
                 </button>
-                <span className="text-xs text-white/60 ml-2">40%</span>
+                <span className="text-xs text-white/60 ml-2">31%</span>
               </div>
             </div>
           </section>
@@ -234,7 +238,7 @@ export default function ProblemDetails() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Grid3X3 size={18} className="text-white/60" />
-                <span className="font-display text-[16px] leading-5">Podobne problemy</span>
+                <span className="font-display text-[16px] leading-5">Related Issues</span>
               </div>
               <div className="flex items-center gap-1 text-xs text-white/60">
                 <span>{similarProblems.length}</span>
@@ -252,7 +256,7 @@ export default function ProblemDetails() {
                 {similarProblems.map((sp) => (
                   <Link
                     key={sp.id}
-                    href={`/problems/${sp.id}`}
+                    href={`/demo/cities/mobile/problems/${sp.id}`}
                     className="relative flex-shrink-0 w-[160px] h-[160px] overflow-hidden rounded-[20px] snap-center hover:scale-[1.02] transition-transform duration-200"
                     aria-label={`Open details for ${sp.title}`}
                   >
@@ -281,5 +285,3 @@ export default function ProblemDetails() {
     </div>
   );
 }
-
-

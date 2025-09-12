@@ -86,26 +86,16 @@ html {
 
 body {
   overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* Ensure main scroll container has proper snap behavior (homepage only) */
 #problems-scroll-container {
   scroll-snap-type: y mandatory !important;
   scroll-padding: 0 !important;
-  scroll-behavior: smooth !important;
-}
-
-/* Force instant scroll behavior */
-main * {
   scroll-behavior: auto !important;
-}
-
-/* Magnetic snap behavior (homepage only) */
-#problems-scroll-container {
-  scroll-snap-type: y mandatory !important;
-  scroll-snap-stop: always !important;
-  scroll-behavior: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: none !important;
+  touch-action: pan-y !important;
 }
 
 /* Apply snap properties only to homepage slides */
@@ -117,8 +107,8 @@ main * {
 }
 
 /* Force hardware acceleration for smoother scrolling */
-main > *, #problems-scroll-container > * {
-  will-change: scroll-position;
+#problems-scroll-container > * {
+  will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
 }
@@ -144,17 +134,18 @@ main.problem-detail-page .grid {
   }
 }
 
-/* Prevent momentum scrolling on iOS */
+/* Mobile-specific scroll fixes */
 @media screen and (max-width: 768px) {
-  main {
-    -webkit-overflow-scrolling: auto;
+  #problems-scroll-container {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-scrolling: touch !important;
+    scroll-behavior: auto !important;
+    touch-action: pan-y !important;
   }
-}
-
-/* Force instant snap behavior on all browsers */
-* {
-  -ms-scroll-snap-type: y mandatory;
-  -ms-scroll-snap-stop: always;
+  
+  #problems-scroll-container > * {
+    touch-action: pan-y !important;
+  }
 }
 
 /* Hide scrollbar utility */

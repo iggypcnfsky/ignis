@@ -9,12 +9,16 @@ export default function ProblemPillNav({
   problemId,
   active = "problem",
   className,
+  context,
 }: {
   problemId: string;
   active?: PillKey;
   className?: string;
+  context?: string;
 }) {
-  const basePath = `/problems/${problemId}`;
+  const basePath = context 
+    ? `/demo/${context}/mobile/problems/${problemId}`
+    : `/problems/${problemId}`;
 
   const pills: { key: PillKey; label: string; href: string; icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
     { key: "problem", label: "Problem", href: `${basePath}`, icon: FileText },

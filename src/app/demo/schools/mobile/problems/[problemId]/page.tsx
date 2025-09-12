@@ -8,11 +8,15 @@ import { Calendar, ZoomIn, FileText, BarChart3, MapPin, Grid3X3 } from "lucide-r
 import ProblemPillNav from "@/components/ProblemPillNav";
 import SharedHeader from "@/components/SharedHeader";
 import ImageZoomModal from "@/components/ImageZoomModal";
-import { demoProblems } from "@/lib/demoProblems";
+import { getDemoProblems, type DemoContext } from "@/lib/demoContext";
 
-export default function ProblemDetails() {
+const CONTEXT: DemoContext = 'schools';
+
+export default function SchoolsProblemDetails() {
   const params = useParams<{ problemId: string }>();
   const problemId = Array.isArray(params?.problemId) ? params?.problemId[0] : params?.problemId;
+  
+  const demoProblems = getDemoProblems(CONTEXT);
   const problem = demoProblems.find((p) => p.id === problemId) ?? demoProblems[0];
   const similarProblems = demoProblems.filter((p) => p.id !== problem.id).slice(0, 3);
 
@@ -67,11 +71,11 @@ export default function ProblemDetails() {
         }
       `}</style>
       {/* Shared Header */}
-      <SharedHeader mode="back" backHref="/" />
+      <SharedHeader mode="back" backHref="/demo/schools/mobile" />
       
       {/* Navigation */}
       <div className="relative z-10 px-3 pt-20 pb-2">
-        <ProblemPillNav problemId={problem.id} active="problem" />
+        <ProblemPillNav problemId={problem.id} active="problem" context="schools" />
       </div>
 
       {/* Content */}
@@ -113,7 +117,7 @@ export default function ProblemDetails() {
               {/* Hover overlay for desktop */}
               <div className="absolute inset-0 hidden lg:flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                 <div className="bg-black/50 rounded-full px-4 py-2 text-white text-sm">
-                  Click to zoom
+                  Kliknij aby powiększyć
                 </div>
               </div>
             </button>
@@ -131,7 +135,7 @@ export default function ProblemDetails() {
           >
             <div className="flex items-center gap-2">
               <MapPin size={18} className="text-white/60" />
-              <span className="font-display text-[16px] leading-5">Location</span>
+              <span className="font-display text-[16px] leading-5">Lokalizacja</span>
             </div>
             <div className="mt-4 aspect-video bg-[#1a1a1a] rounded-[20px] flex items-center justify-center">
               <div className="text-center text-white/60">
@@ -140,8 +144,8 @@ export default function ProblemDetails() {
                     <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <p className="text-sm">Google Maps</p>
-                <p className="text-xs text-white/40 mt-1">Coming Soon</p>
+                <p className="text-sm">Mapa szkoły</p>
+                <p className="text-xs text-white/40 mt-1">Wkrótce</p>
               </div>
             </div>
           </section>
@@ -206,7 +210,7 @@ export default function ProblemDetails() {
                 >
                   Tak (12)
                 </button>
-                <span className="text-xs text-white/60 ml-2">60%</span>
+                <span className="text-xs text-white/60 ml-2">67%</span>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -216,7 +220,7 @@ export default function ProblemDetails() {
                 >
                   Nie (6)
                 </button>
-                <span className="text-xs text-white/60 ml-2">40%</span>
+                <span className="text-xs text-white/60 ml-2">33%</span>
               </div>
             </div>
           </section>
@@ -252,7 +256,7 @@ export default function ProblemDetails() {
                 {similarProblems.map((sp) => (
                   <Link
                     key={sp.id}
-                    href={`/problems/${sp.id}`}
+                    href={`/demo/schools/mobile/problems/${sp.id}`}
                     className="relative flex-shrink-0 w-[160px] h-[160px] overflow-hidden rounded-[20px] snap-center hover:scale-[1.02] transition-transform duration-200"
                     aria-label={`Open details for ${sp.title}`}
                   >
@@ -281,5 +285,3 @@ export default function ProblemDetails() {
     </div>
   );
 }
-
-

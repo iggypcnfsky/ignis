@@ -6,15 +6,20 @@ import { Plus } from "lucide-react";
 import ProblemPillNav from "@/components/ProblemPillNav";
 import SharedHeader from "@/components/SharedHeader";
 import IdeaCard from "@/components/IdeaCard";
-import { demoProblems } from "@/lib/demoProblems";
-import { demoIdeas } from "@/lib/demoIdeas";
+import { getDemoProblems, getDemoIdeas, type DemoContext } from "@/lib/demoContext";
 
-export default function ProblemIdeasPage() {
+const CONTEXT: DemoContext = 'cities';
+
+export default function CitiesProblemIdeasPage() {
 	const router = useRouter();
 	const params = useParams<{ problemId: string }>();
 	const problemId = Array.isArray(params?.problemId)
 		? params?.problemId[0]
 		: params?.problemId;
+	
+	const demoProblems = getDemoProblems(CONTEXT);
+	const demoIdeas = getDemoIdeas(CONTEXT);
+	
 	const problem = demoProblems.find((p) => p.id === problemId) ?? demoProblems[0];
 	const problemIdeas = demoIdeas.filter((idea) => idea.problemId === problemId);
 
@@ -63,11 +68,11 @@ export default function ProblemIdeasPage() {
 	return (
 		<div className="relative min-h-dvh w-full bg-[#141414] text-white">
 			{/* Shared Header */}
-			<SharedHeader mode="back" backHref={`/problems/${problem.id}`} />
+			<SharedHeader mode="back" backHref={`/demo/cities/mobile/problems/${problem.id}`} />
 			
 			{/* Navigation */}
 			<div className="relative z-10 px-3 pt-20 pb-2">
-				<ProblemPillNav problemId={problem.id} active="ideas" />
+				<ProblemPillNav problemId={problem.id} active="ideas" context="cities" />
 			</div>
 
 		<main className="px-3 pb-16">
@@ -87,7 +92,7 @@ export default function ProblemIdeasPage() {
 						>
 							<IdeaCard
 								className=""
-								href={`/problems/${problem.id}/ideas/${idea.id}`}
+								href={`/demo/cities/mobile/problems/${problem.id}/ideas/${idea.id}`}
 								description={idea.description}
 								votesCount={idea.votesCount}
 							/>
@@ -99,7 +104,7 @@ export default function ProblemIdeasPage() {
 				<div className="sticky bottom-0 left-0 right-0 pb-4 z-5">
 					<button
 						type="button"
-						onClick={() => router.push(`/ideas/add?problemId=${problem.id}`)}
+						onClick={() => router.push(`/ideas/add?problemId=${problem.id}&context=cities`)}
 						className="w-full h-12 border-4 border-[#FF8400] bg-[#212121] rounded-[100px] flex items-center justify-center gap-2 shadow-lg"
 					>
 						<Plus size={18} />
@@ -110,5 +115,3 @@ export default function ProblemIdeasPage() {
 		</div>
 	);
 }
-
-

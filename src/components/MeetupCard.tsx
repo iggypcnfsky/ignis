@@ -12,138 +12,142 @@ type MeetupCardProps = {
 
 export default function MeetupCard({ meetup, className }: MeetupCardProps) {
   return (
-    <div className={`relative bg-[#212121] rounded-[30px] p-6 ${className ?? ""}`}>
-      {/* Status indicator - positioned absolutely in top right */}
-      <div className="absolute top-4 right-4">
-        {meetup.isLive && (
-          <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full border-2 border-[#FF8400] bg-transparent">
-            <div className="w-2 h-2 bg-[#FF8400] rounded-full animate-pulse"></div>
-            <span className="text-[12px] leading-[1] font-sans text-white font-medium">
-              Live
-            </span>
-          </div>
-        )}
-        {meetup.isOnline && !meetup.isLive && (
-          <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full border-2 border-[#FF8400] bg-transparent">
-            <span className="text-[12px] leading-[1] font-sans text-white font-medium">
-              Online
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Time info for specific date/time meetups */}
-      {meetup.time && (
-        <div className="absolute top-4 left-4">
-          <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-full border-2 border-[#353535] bg-transparent">
-            <span className="text-[12px] leading-[1] font-sans text-white font-medium">
+    <div className={`relative bg-[#212121] rounded-[20px] p-4 ${className ?? ""}`}>
+      {/* Status and time in header row */}
+      <div className="flex items-center justify-between mb-3">
+        {/* Time */}
+        {meetup.time && (
+          <div className="px-3 py-1 rounded-full bg-[#2a2a2a]">
+            <span className="text-[11px] font-sans text-white/80">
               {meetup.time}
             </span>
           </div>
+        )}
+        
+        {/* Status indicators */}
+        <div className="flex items-center gap-2">
+          {meetup.isLive && (
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-[#FF8400]/20">
+              <div className="w-1.5 h-1.5 bg-[#FF8400] rounded-full animate-pulse"></div>
+              <span className="text-[10px] font-sans text-[#FF8400] font-medium">Live</span>
+            </div>
+          )}
+          {meetup.isOnline && !meetup.isLive && (
+            <div className="px-2 py-1 rounded-full bg-[#FF8400]/20">
+              <span className="text-[10px] font-sans text-[#FF8400] font-medium">Online</span>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Title */}
-      <div className="pt-12 pb-4">
-        <h3 className="text-[16px] leading-[1.17] font-display text-white">
+      <div className="mb-3">
+        <h3 className="text-[15px] leading-tight font-sans text-white font-medium">
           {meetup.title}
         </h3>
       </div>
 
-      {/* Description - if available */}
+      {/* Organizer */}
+      <div className="mb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-[#FF8400] rounded-full flex items-center justify-center">
+            <span className="text-[10px] font-sans text-white font-bold">
+              {meetup.organizer.charAt(0)}
+            </span>
+          </div>
+          <span className="text-[11px] font-sans text-white/60">
+            Organizuje: {meetup.organizer}
+          </span>
+        </div>
+      </div>
+
+      {/* Description */}
       {meetup.description && (
-        <div className="pb-4">
-          <p className="text-[14px] leading-[1.3] font-sans text-white/80 line-clamp-2">
+        <div className="mb-4">
+          <p className="text-[13px] leading-[1.4] font-sans text-white/70 line-clamp-2">
             {meetup.description}
           </p>
         </div>
       )}
 
-      {/* Location - if available */}
-      {meetup.location && (
-        <div className="pb-4">
-          <div className="flex items-center gap-2 text-[12px] leading-[1] font-sans text-white/60">
-            <span>📍</span>
-            <span>{meetup.location}</span>
-          </div>
-        </div>
-      )}
-
-      {/* WhatsApp - if available */}
-      {meetup.whatsapp && (
-        <div className="pb-4">
-          <div className="flex items-center gap-2 text-[12px] leading-[1] font-sans text-white/60">
-            <span>📱</span>
-            <span>{meetup.whatsapp}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Ideas to be discussed */}
+      {/* Simplified ideas section */}
       {meetup.ideaIds.length > 0 && (
-        <div className="pb-6 px-2">
-          <div className="text-[12px] leading-[1] font-sans text-white/60 mb-3">
-            💡 Ideas to discuss:
+        <div className="mb-4">
+          <div className="text-[11px] font-sans text-white/50 mb-2">
+            {meetup.ideaIds.length} idea{meetup.ideaIds.length > 1 ? 's' : ''} to discuss
           </div>
-          <div className="space-y-3">
-            {meetup.ideaIds.map((ideaId) => {
+          <div className="flex flex-wrap gap-1">
+            {meetup.ideaIds.slice(0, 3).map((ideaId) => {
               const idea = demoIdeas.find(i => i.id === ideaId);
               return idea ? (
-                <div key={ideaId} className="bg-[#1a1a1a] rounded-[12px] p-4">
-                  <div className="text-[13px] leading-[1.2] font-display text-white/90 mb-2">
+                <div key={ideaId} className="px-2 py-1 bg-[#2a2a2a] rounded-md">
+                  <span className="text-[10px] font-sans text-white/60 truncate">
                     {idea.title}
-                  </div>
-                  <div className="text-[12px] leading-[1.3] font-sans text-white/70 line-clamp-2 mb-2">
-                    {idea.description}
-                  </div>
-                  <div className="text-[11px] leading-[1] font-sans text-white/50">
-                    {idea.votesCount} votes
-                  </div>
-                </div>
-              ) : (
-                <div key={ideaId} className="text-[12px] leading-[1.2] font-sans text-white/80">
-                  • Idea not found
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Problem Images */}
-      {meetup.problemIds.length > 0 && (
-        <div className="pt-4">
-          <div className="flex gap-3 overflow-hidden w-full">
-            {meetup.problemIds.slice(0, 3).map((problemId, index) => {
-              const problem = demoProblems.find(p => p.id === problemId);
-              return problem ? (
-                <div
-                  key={problemId}
-                  className="relative flex-1 min-w-0 h-40 rounded-[12px] overflow-hidden bg-[#1a1a1a]"
-                  style={{ zIndex: 3 - index, maxWidth: '200px' }}
-                >
-                  <Image
-                    src={problem.imagePath}
-                    alt={problem.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 192px, 200px"
-                  />
+                  </span>
                 </div>
               ) : null;
             })}
-            {meetup.problemIds.length > 3 && (
-              <div className="flex-1 min-w-0 h-40 rounded-[12px] bg-[#1a1a1a] flex items-center justify-center"
-                style={{ maxWidth: '200px' }}
-              >
-                <span className="text-[12px] leading-[1] font-sans text-white/60">
-                  +{meetup.problemIds.length - 3}
+            {meetup.ideaIds.length > 3 && (
+              <div className="px-2 py-1 bg-[#2a2a2a] rounded-md">
+                <span className="text-[10px] font-sans text-white/60">
+                  +{meetup.ideaIds.length - 3}
                 </span>
               </div>
             )}
           </div>
         </div>
       )}
+
+      {/* Simplified problem images */}
+      {meetup.problemIds.length > 0 && (
+        <div>
+          <div className="text-[11px] font-sans text-white/50 mb-2">
+            {meetup.problemIds.length} problem{meetup.problemIds.length > 1 ? 's' : ''}
+          </div>
+          <div className="flex gap-2">
+            {meetup.problemIds.slice(0, 4).map((problemId) => {
+              const problem = demoProblems.find(p => p.id === problemId);
+              return problem ? (
+                <div
+                  key={problemId}
+                  className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#2a2a2a]"
+                >
+                  <Image
+                    src={problem.imagePath}
+                    alt={problem.title}
+                    fill
+                    className="object-cover"
+                    sizes="48px"
+                  />
+                </div>
+              ) : null;
+            })}
+            {meetup.problemIds.length > 4 && (
+              <div className="w-12 h-12 rounded-lg bg-[#2a2a2a] flex items-center justify-center">
+                <span className="text-[9px] font-sans text-white/50">
+                  +{meetup.problemIds.length - 4}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* RSVP Button */}
+      <div className="mt-4 pt-3 border-t border-white/10">
+        <button
+          type="button"
+          className="w-full py-2 px-4 bg-[#FF8400] hover:bg-[#FF8400]/90 rounded-lg transition-colors"
+          onClick={() => {
+            // TODO: Implement RSVP functionality
+            console.log(`RSVP for meetup ${meetup.id}`);
+          }}
+        >
+          <span className="text-[12px] font-sans text-white font-medium">
+            Wezmę udział
+          </span>
+        </button>
+      </div>
     </div>
   );
 }
